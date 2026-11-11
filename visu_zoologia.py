@@ -11,7 +11,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Estilos CSS definitivos para forzar la desaparición de cualquier checkbox o círculo de radio
+# Estilos CSS definitivos y limpios
 st.markdown("""
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
@@ -75,39 +75,6 @@ st.markdown("""
             color: #FFFFFF !important;
             text-transform: uppercase !important;
             text-align: left !important;
-        }
-
-        /* ELIMINACIÓN RADICAL Y TOTAL DE CUALQUIER CHECKBOX O RADIO BUTTON */
-        [data-testid="stSidebar"] input[type="radio"],
-        [data-testid="stSidebar"] input[type="checkbox"],
-        [data-testid="stSidebar"] div[data-baseweb="radio"],
-        [data-testid="stSidebar"] div[role="radiogroup"] svg,
-        [data-testid="stSidebar"] div[role="radiogroup"] span,
-        [data-testid="stSidebar"] .st-bp {
-            display: none !important;
-            width: 0 !important;
-            height: 0 !important;
-            opacity: 0 !important;
-            pointer-events: none !important;
-        }
-
-        /* Estilo de tarjeta limpia para las opciones del menú lateral */
-        [data-testid="stSidebar"] div.row-widget.stRadio label {
-            background-color: #161616 !important;
-            border: 2px solid #333333 !important;
-            border-radius: 8px !important;
-            padding: 12px 14px !important;
-            width: 100% !important;
-            display: block !important;
-            cursor: pointer !important;
-            transition: all 0.2s ease !important;
-            text-align: left !important;
-            margin-bottom: 8px !important;
-        }
-
-        [data-testid="stSidebar"] div.row-widget.stRadio label:hover {
-            border-color: #FF0000 !important;
-            background-color: #222222 !important;
         }
 
         /* Tarjeta central estabilizada y centrada siempre */
@@ -243,6 +210,21 @@ st.markdown("""
         .stButton > button:hover {
             background-color: #D90000;
             color: #FFFFFF;
+        }
+
+        /* Estilos específicos para los botones del menú lateral */
+        [data-testid="stSidebar"] .stButton > button {
+            width: 100% !important;
+            background-color: #161616 !important;
+            border: 2px solid #333333 !important;
+            text-align: left !important;
+            padding: 10px 14px !important;
+            margin-bottom: 8px !important;
+            box-shadow: none !important;
+        }
+        [data-testid="stSidebar"] .stButton > button:hover {
+            border-color: #FF0000 !important;
+            background-color: #222222 !important;
         }
 
         /* Botón de cierre dentro del menú lateral */
@@ -392,7 +374,7 @@ st.markdown("""
 # Codificar el logo en base64
 logo_base64 = __import__("base64").b64encode(open("pp_2.png", "rb").read()).decode("utf-8")
 
-# Script global en JS para purgar dinámicamente los inputs de tipo radio del sidebar en cuanto aparezcan
+# Script global en JS para el control de apertura y cierre del menú lateral mediante el logo
 st.markdown(f"""
     <div class="logo-btn-container" onclick="toggleSidebar()" title="Abrir / Cerrar Menú">
         <img src="data:image/png;base64,{logo_base64}" alt="Logo Menú">
@@ -414,17 +396,14 @@ st.markdown(f"""
                 doc.dispatchEvent(event);
             }}
         }}
-
-        // Observer para eliminar de forma fulminante cualquier círculo o input de radio residual
-        const observer = new MutationObserver(() => {{
-            const radios = parent.document.querySelectorAll('[data-testid="stSidebar"] input[type="radio"], [data-testid="stSidebar"] div[data-baseweb="radio"]');
-            radios.forEach(el => el.remove());
-        }});
-        observer.observe(parent.document.body, {{ childList: true, subtree: true }});
     </script>
 """, unsafe_allow_html=True)
 
-# Menú lateral adaptado sin casillas y con botón de cierre con flecha
+# Inicializar la sección seleccionada en el session_state si no existe
+if "seccion_seleccionada" not in st.session_state:
+    st.session_state.seccion_seleccionada = "VERTEBRADOS"
+
+# Menú lateral adaptado sin rastro de radios ni checkboxes (construido con botones nativos limpios)
 st.sidebar.title("MENÚ")
 
 st.sidebar.markdown("""
@@ -433,11 +412,21 @@ st.sidebar.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-seccion_seleccionada = st.sidebar.radio(
-    "SELECCIONA GRUPO",
-    ["VERTEBRADOS", "INVERTEBRADOS", "ARTRÓPODOS"],
-    label_visibility="visible"
-)
+st.sidebar.markdown("<p style='font-size: 0.75rem; color: #FFCCCC; margin-bottom: 5px;'>SELECCIONA GRUPO</p>", unsafe_allow_html=True)
+
+if st.sidebar.button("VERTEBRADOS", use_container_width=True):
+    st.session_state.seccion_seleccionada = "VERTEBRADOS"
+    st.rerun()
+
+if st.sidebar.button("INVERTEBRADOS", use_container_width=True):
+    st.session_state.seccion_seleccionada = "INVERTEBRADOS"
+    st.rerun()
+
+if st.sidebar.button("ARTRÓPODOS", use_container_width=True):
+    st.session_state.seccion_seleccionada = "ARTRÓPODOS"
+    st.rerun()
+
+seccion_seleccionada = st.session_state.seccion_seleccionada
 
 # Banda longitudinal inferior con las redes sociales
 st.markdown("""
