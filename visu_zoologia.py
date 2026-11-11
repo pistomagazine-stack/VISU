@@ -4,14 +4,14 @@ from pathlib import Path
 import base64
 import unicodedata
 
-# Configuración de la página
+# Configuración de la página (sidebar colapsado al entrar)
 st.set_page_config(
     page_title="Visu Máster - Biología UCM",
     layout="centered",
     initial_sidebar_state="collapsed"
 )
 
-# Estilos CSS definitivos para limpiar la interfaz, centrar cabeceras y ocultar elementos no deseados
+# Estilos CSS definitivos
 st.markdown("""
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
@@ -26,7 +26,7 @@ st.markdown("""
             padding-bottom: 120px !important;
         }
 
-        /* Ocultar elementos nativos de cabecera de Streamlit y el botón de colapsar */
+        /* Ocultar elementos nativos de cabecera de Streamlit */
         header[data-testid="stHeader"] {
             background: transparent !important;
         }
@@ -35,7 +35,7 @@ st.markdown("""
             display: none !important;
         }
 
-        /* Logotipo interactivo en la esquina superior izquierda como único disparador del menú */
+        /* Logotipo interactivo en la esquina superior izquierda */
         .logo-btn-container {
             position: fixed;
             top: 20px;
@@ -77,11 +77,20 @@ st.markdown("""
             text-align: left !important;
         }
 
-        /* Eliminar por completo cualquier rastro de casillas, checkboxes o círculos en los radio buttons */
+        /* Eliminación total y absoluta de checkboxes o círculos en los radio buttons */
         [data-testid="stSidebar"] div.row-widget.stRadio div[role="radiogroup"] > label > div:first-child,
         [data-testid="stSidebar"] div.row-widget.stRadio input[type="radio"],
         [data-testid="stSidebar"] .st-bp,
-        [data-testid="stSidebar"] div[data-baseweb="radio"] {
+        [data-testid="stSidebar"] div[data-baseweb="radio"],
+        [data-testid="stSidebar"] div[data-testid="stMarkdownContainer"] input {
+            display: none !important;
+            opacity: 0 !important;
+            width: 0 !important;
+            height: 0 !important;
+        }
+
+        /* Forzar ocultación de cualquier input nativo residual de radio en el sidebar */
+        [data-testid="stSidebar"] input[type="radio"] {
             display: none !important;
         }
 
@@ -124,7 +133,7 @@ st.markdown("""
             text-transform: uppercase !important;
         }
 
-        /* Ritmo vertical */
+        /* Ritmo vertical y centrado estricto */
         h1, h2, h3, p, div.stTextInput, .stButton, .feedback-error, .feedback-success, .img-borde, .test-result {
             margin-top: 0 !important;
             margin-bottom: 0.75rem !important;
@@ -237,6 +246,25 @@ st.markdown("""
         .stButton > button:hover {
             background-color: #D90000;
             color: #FFFFFF;
+        }
+
+        /* Botón de cierre dentro del menú lateral */
+        .close-sidebar-btn {
+            background-color: #161616;
+            border: 2px solid #333333;
+            color: #FFFFFF;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: block;
+            transition: all 0.2s ease;
+        }
+        .close-sidebar-btn:hover {
+            border-color: #FF0000;
+            background-color: #222222;
         }
 
         /* Bloques de feedback */
@@ -367,34 +395,43 @@ st.markdown("""
 # Codificar el logo en base64
 logo_base64 = __import__("base64").b64encode(open("pp_2.png", "rb").read()).decode("utf-8")
 
-# Logotipo interactivo en la esquina superior izquierda como único disparador del menú lateral
+# Logotipo interactivo en la esquina superior izquierda (actúa como interruptor para abrir/cerrar)
 st.markdown(f"""
-    <div class="logo-btn-container" onclick="toggleSidebar()" title="Abrir Menú">
+    <div class="logo-btn-container" onclick="toggleSidebar()" title="Abrir / Cerrar Menú">
         <img src="data:image/png;base64,{logo_base64}" alt="Logo Menú">
     </div>
     
     <script>
         function toggleSidebar() {{
-            // Simula la acción sobre el botón de control interno de Streamlit para desplegar la barra lateral
-            const sbControl = parent.document.querySelector('[data-testid="collapsedControl"]') || 
-                              parent.document.querySelector('button[kind="header"]');
-            if (sbControl) {{
-                sbControl.click();
+            // Simula la pulsación en el botón nativo de Streamlit para alternar el estado del sidebar
+            const doc = parent.document;
+            const openBtn = doc.querySelector('[data-testid="collapsedControl"]') || 
+                            doc.querySelector('button[kind="header"]');
+            if (openBtn) {{
+                openBtn.click();
             }} else {{
-                // Disparador de eventos genérico para forzar la apertura del sidebar si está colapsado
+                // Método alternativo mediante atajo de teclado simulado si el botón no está visible
                 const event = new KeyboardEvent('keydown', {{
                     key: 'm',
                     ctrlKey: true,
                     bubbles: true
                 }});
-                parent.document.dispatchEvent(event);
+                doc.dispatchEvent(event);
             }}
         }}
     </script>
 """, unsafe_allow_html=True)
 
-# Menú lateral adaptado sin casillas y perfectamente alineado
+# Menú lateral adaptado sin casillas y con botón de cierre con flecha
 st.sidebar.title("MENÚ")
+
+# Botón interactivo de cierre dentro del panel lateral con símbolo de flecha
+st.sidebar.markdown("""
+    <div class="close-sidebar-btn" onclick="parent.document.querySelector('[data-testid=\\'collapsedControl\\']')?.click() || parent.document.querySelector('button[kind=\\'header\\']')?.click()">
+        ← CERRAR MENÚ
+    </div>
+""", unsafe_allow_html=True)
+
 seccion_seleccionada = st.sidebar.radio(
     "SELECCIONA GRUPO",
     ["VERTEBRADOS", "INVERTEBRADOS", "ARTRÓPODOS"],
@@ -719,7 +756,7 @@ DATOS_VERTEBRADOS = [
     {"clase": "CL. MAMMALIA", "orden": "INFRAORDEN CETACEA", "especie": "Ballena franca (Eubalaena glacialis)", "cientifico": "Eubalaena_glacialis"}
 ]
 
-# Cabecera dinámica centrada según la sección seleccionada
+# Cabecera dinámica estrictamente centrada según la sección seleccionada
 if seccion_seleccionada == "VERTEBRADOS":
     st.markdown("<h1>VISU VERTEBRADOS</h1>", unsafe_allow_html=True)
     st.markdown("<div class='subtitle'>identificación de especies</div>", unsafe_allow_html=True)
@@ -894,10 +931,10 @@ if seccion_seleccionada == "VERTEBRADOS":
 
         nota = round((aciertos / total_preguntas) * 10, 1) if total_preguntas > 0 else 0
 
-        st.markdown("<h3>Resultados del Test Visu</h3>", unsafe_allow_html=True)
-        st.markdown(f"<p>Aciertos totales: {aciertos}</p>", unsafe_allow_html=True)
-        st.markdown(f"<p>Fallos totales: {fallos}</p>", unsafe_allow_html=True)
-        st.markdown(f"<h3>Puntuación Final: {nota} / 10</h3>", unsafe_allow_html=True)
+        st.markdown("<h3 style='text-align: center;'>Resultados del Test Visu</h3>", unsafe_allow_html=True)
+        st.markdown(f"<p style='text-align: center;'>Aciertos totales: {aciertos}</p>", unsafe_allow_html=True)
+        st.markdown(f"<p style='text-align: center;'>Fallos totales: {fallos}</p>", unsafe_allow_html=True)
+        st.markdown(f"<h3 style='text-align: center;'>Puntuación Final: {nota} / 10</h3>", unsafe_allow_html=True)
 
         if nota >= 5.0:
             st.balloons()
@@ -918,10 +955,10 @@ if seccion_seleccionada == "VERTEBRADOS":
 
 elif seccion_seleccionada == "INVERTEBRADOS":
     st.markdown("<br><br>", unsafe_allow_html=True)
-    st.markdown("<h3>MÓDULO EN DESARROLLO</h3>", unsafe_allow_html=True)
-    st.markdown("<p class='subtitle'>Próximamente disponible el test de invertebrados no artrópodos.</p>", unsafe_allow_html=True)
+    st.markdown("<h3 style='text-align: center;'>MÓDULO EN DESARROLLO</h3>", unsafe_allow_html=True)
+    st.markdown("<p class='subtitle' style='text-align: center;'>Próximamente disponible el test de invertebrados no artrópodos.</p>", unsafe_allow_html=True)
 
 else:
     st.markdown("<br><br>", unsafe_allow_html=True)
-    st.markdown("<h3>MÓDULO EN DESARROLLO</h3>", unsafe_allow_html=True)
-    st.markdown("<p class='subtitle'>Próximamente disponible el test de artrópodos.</p>", unsafe_allow_html=True)
+    st.markdown("<h3 style='text-align: center;'>MÓDULO EN DESARROLLO</h3>", unsafe_allow_html=True)
+    st.markdown("<p class='subtitle' style='text-align: center;'>Próximamente disponible el test de artrópodos.</p>", unsafe_allow_html=True)
