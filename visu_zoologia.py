@@ -39,8 +39,8 @@ st.markdown("""
             display: none !important;
         }
 
-        /* Logotipo interactivo en la esquina superior izquierda para abrir el menú */
-        .logo-btn-container {
+        /* Posicionamiento absoluto para superponer el botón de Streamlit sobre el logo */
+        .logo-wrapper {
             position: fixed;
             top: 20px;
             left: 20px;
@@ -49,23 +49,27 @@ st.markdown("""
             height: 75px;
             border-radius: 14px;
             overflow: hidden;
+            border: none;
             background: transparent;
+        }
+
+        /* Estilo para que el botón de Streamlit actúe como el logotipo interactivo */
+        .logo-wrapper div.stButton > button {
+            width: 75px !important;
+            height: 75px !important;
+            padding: 0 !important;
+            border-radius: 14px !important;
+            border: none !important;
+            background-size: cover !important;
+            background-position: center !important;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             transition: transform 0.2s ease;
         }
 
-        .logo-btn-container:hover {
+        .logo-wrapper div.stButton > button:hover {
             transform: scale(1.05);
-        }
-
-        .logo-btn-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 14px;
+            background-color: transparent !important;
         }
 
         /* Panel lateral personalizado flotante (Inicia oculto a la izquierda) */
@@ -399,6 +403,10 @@ st.markdown("""
 # Codificar el logo en base64
 logo_base64 = __import__("base64").b64encode(open("pp_2.png", "rb").read()).decode("utf-8")
 
+# Inicializar estado del menú flotante si no existe
+if "menu_abierto" not in st.session_state:
+    st.session_state.menu_abierto = False
+
 # Manejo de la sección seleccionada mediante query_params
 query_params = st.query_params
 if "grupo" in query_params:
@@ -410,34 +418,59 @@ clase_vert = "menu-item active" if seccion_seleccionada == "VERTEBRADOS" else "m
 clase_inv = "menu-item active" if seccion_seleccionada == "INVERTEBRADOS" else "menu-item"
 clase_art = "menu-item active" if seccion_seleccionada == "ARTRÓPODOS" else "menu-item"
 
-# Renderizado del panel lateral flotante personalizado y el botón de apertura
+# Inyectar imagen de fondo en el botón de Streamlit para el logo mediante CSS en caliente
 st.markdown(f"""
-    <!-- Botón flotante del logotipo -->
-    <div class="logo-btn-container" onclick="toggleSidebar()" title="Abrir Menú">
-        <img src="data:image/png;base64,{logo_base64}" alt="Logo Menú">
-    </div>
+    <style>
+        .logo-wrapper div.stButton > button {{
+            background-image: url("data:image/png;base64,{logo_base64}") !important;
+        }}
+    </style>
+""", unsafe_allow_html=True)
 
-    <!-- Panel lateral personalizado -->
-    <div id="customSidebar" class="custom-sidebar">
+# Botón interactivo real de Streamlit posicionado exactamente en la esquina superior izquierda
+with st.container():
+    st.markdown('<div class="logo-wrapper">', unsafe_allow_html=True)
+    if st.button("", key="btn_toggle_menu", help="Abrir / Cerrar Menú"):
+        st.session_state.menu_abierto = not st.session_state.menu_abierto
+        st.rerun()
+    st.markdown('</div>', unsafe_allow_html=True)
+
+# Estado de la clase 'open' del menú según session_state
+clase_sidebar_css = "custom-sidebar open" if st.session_state.menu_abierto else "custom-sidebar"
+
+# Renderizado del panel lateral flotante personalizado con botón de cierre operativo en Python
+sidebar_html = f"""
+    <div id="customSidebar" class="{clase_sidebar_css}">
         <div class="sidebar-header">
             <h3 class="sidebar-title">MENÚ</h3>
-            <button class="close-sidebar-arrow" onclick="toggleSidebar()" title="Cerrar Menú">‹</button>
         </div>
         <p style='font-size: 0.75rem; color: #FFCCCC; margin-bottom: 8px;'>SELECCIONA GRUPO</p>
         <a href="?grupo=VERTEBRADOS" class="{clase_vert}">VERTEBRADOS</a>
         <a href="?grupo=INVERTEBRADOS" class="{clase_inv}">INVERTEBRADOS</a>
         <a href="?grupo=ARTRÓPODOS" class="{clase_art}">ARTRÓPODOS</a>
     </div>
+"""
+st.markdown(sidebar_html, unsafe_allow_html=True)
+
+# Si el menú está abierto, colocamos un botón de cierre real de Streamlit dentro del panel flotante
+if st.session_state.menu_abierto:
+    st.markdown("""
+        <style>
+            .close-btn-container {
+                position: fixed;
+                top: 15px;
+                left: 260px;
+                z-index: 1000000;
+            }
+        </style>
+        <div class="close-btn-container">
+    """, unsafe_allow_html=True)
     
-    <script>
-        function toggleSidebar() {{
-            const sidebar = parent.document.getElementById('customSidebar');
-            if (sidebar) {{
-                sidebar.classList.toggle('open');
-            }}
-        }}
-    </script>
-""", unsafe_allow_html=True)
+    if st.button("‹", key="btn_cerrar_sidebar", help="Cerrar Menú", type="tertiary"):
+        st.session_state.menu_abierto = False
+        st.rerun()
+        
+    st.markdown("</div>", unsafe_allow_html=True)
 
 # Banda longitudinal inferior con las redes sociales
 st.markdown("""
