@@ -77,6 +77,36 @@ st.markdown("""
             text-align: left !important;
         }
 
+        /* Estilos para los textos interactivos del menú lateral (sin aspecto de botón ni casillas) */
+        .menu-item {
+            background-color: #161616;
+            border: 2px solid #333333;
+            border-radius: 8px;
+            padding: 12px 14px;
+            width: 100%;
+            display: block;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left !important;
+            margin-bottom: 8px;
+            color: #FFFFFF !important;
+            font-weight: 600;
+            text-decoration: none !important;
+            box-sizing: border-box;
+        }
+
+        .menu-item:hover {
+            border-color: #FF0000;
+            background-color: #222222;
+            color: #FF0000 !important;
+        }
+
+        .menu-item.active {
+            border-color: #FFFFFF;
+            background-color: #222222;
+            color: #FFFFFF !important;
+        }
+
         /* Tarjeta central estabilizada y centrada siempre */
         .block-container {
             max-width: 700px !important;
@@ -210,21 +240,6 @@ st.markdown("""
         .stButton > button:hover {
             background-color: #D90000;
             color: #FFFFFF;
-        }
-
-        /* Estilos específicos para los botones del menú lateral */
-        [data-testid="stSidebar"] .stButton > button {
-            width: 100% !important;
-            background-color: #161616 !important;
-            border: 2px solid #333333 !important;
-            text-align: left !important;
-            padding: 10px 14px !important;
-            margin-bottom: 8px !important;
-            box-shadow: none !important;
-        }
-        [data-testid="stSidebar"] .stButton > button:hover {
-            border-color: #FF0000 !important;
-            background-color: #222222 !important;
         }
 
         /* Botón de cierre dentro del menú lateral */
@@ -374,7 +389,7 @@ st.markdown("""
 # Codificar el logo en base64
 logo_base64 = __import__("base64").b64encode(open("pp_2.png", "rb").read()).decode("utf-8")
 
-# Script global en JS para el control de apertura y cierre del menú lateral mediante el logo
+# Script global en JS para el control de apertura/cierre y cambio de sección mediante los textos del menú
 st.markdown(f"""
     <div class="logo-btn-container" onclick="toggleSidebar()" title="Abrir / Cerrar Menú">
         <img src="data:image/png;base64,{logo_base64}" alt="Logo Menú">
@@ -396,14 +411,29 @@ st.markdown(f"""
                 doc.dispatchEvent(event);
             }}
         }}
+
+        function seleccionarSeccion(seccion) {{
+            const doc = parent.document;
+            const inputs = doc.querySelectorAll('input[type="hidden"], input[type="text"]');
+            // Busca un input de Streamlit para actualizar y forzar el cambio de estado de forma limpia
+            const queryInput = doc.querySelector('input[aria-label="SELECCIONA GRUPO"]') || inputs[0];
+            
+            // Creamos un parámetro en la URL o recargamos simulando la selección
+            const url = new URL(window.location.href);
+            url.searchParams.set('grupo', seccion);
+            window.location.href = url.toString();
+        }}
     </script>
 """, unsafe_allow_html=True)
 
-# Inicializar la sección seleccionada en el session_state si no existe
-if "seccion_seleccionada" not in st.session_state:
-    st.session_state.seccion_seleccionada = "VERTEBRADOS"
+# Manejo de la sección seleccionada mediante query_params de Streamlit para que los textos actúen como enlaces directos
+query_params = st.query_params
+if "grupo" in query_params:
+    seccion_seleccionada = query_params["grupo"]
+else:
+    seccion_seleccionada = "VERTEBRADOS"
 
-# Menú lateral adaptado sin rastro de radios ni checkboxes (construido con botones nativos limpios)
+# Menú lateral con textos limpios y pulsables (sin checkboxes, sin radios y sin botones de Streamlit)
 st.sidebar.title("MENÚ")
 
 st.sidebar.markdown("""
@@ -412,21 +442,18 @@ st.sidebar.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-st.sidebar.markdown("<p style='font-size: 0.75rem; color: #FFCCCC; margin-bottom: 5px;'>SELECCIONA GRUPO</p>", unsafe_allow_html=True)
+st.sidebar.markdown("<p style='font-size: 0.75rem; color: #FFCCCC; margin-bottom: 8px;'>SELECCIONA GRUPO</p>", unsafe_allow_html=True)
 
-if st.sidebar.button("VERTEBRADOS", use_container_width=True):
-    st.session_state.seccion_seleccionada = "VERTEBRADOS"
-    st.rerun()
+# Renderizado de los textos pulsables en el sidebar
+clase_vert = "menu-item active" if seccion_seleccionada == "VERTEBRADOS" else "menu-item"
+clase_inv = "menu-item active" if seccion_seleccionada == "INVERTEBRADOS" else "menu-item"
+clase_art = "menu-item active" if seccion_seleccionada == "ARTRÓPODOS" else "menu-item"
 
-if st.sidebar.button("INVERTEBRADOS", use_container_width=True):
-    st.session_state.seccion_seleccionada = "INVERTEBRADOS"
-    st.rerun()
-
-if st.sidebar.button("ARTRÓPODOS", use_container_width=True):
-    st.session_state.seccion_seleccionada = "ARTRÓPODOS"
-    st.rerun()
-
-seccion_seleccionada = st.session_state.seccion_seleccionada
+st.sidebar.markdown(f"""
+    <a href="?grupo=VERTEBRADOS" class="{clase_vert}">VERTEBRADOS</a>
+    <a href="?grupo=INVERTEBRADOS" class="{clase_inv}">INVERTEBRADOS</a>
+    <a href="?grupo=ARTRÓPODOS" class="{clase_art}">ARTRÓPODOS</a>
+""", unsafe_allow_html=True)
 
 # Banda longitudinal inferior con las redes sociales
 st.markdown("""
