@@ -11,7 +11,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Estilos CSS avanzados y limpios
+# Estilos CSS definitivos para limpiar la interfaz, centrar cabeceras y ocultar elementos no deseados
 st.markdown("""
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
@@ -26,16 +26,16 @@ st.markdown("""
             padding-bottom: 120px !important;
         }
 
-        /* Ocultar elementos nativos de cabecera de Streamlit por completo */
+        /* Ocultar elementos nativos de cabecera de Streamlit y el botón de colapsar */
         header[data-testid="stHeader"] {
             background: transparent !important;
         }
         
-        button[kind="header"], [data-testid="collapsedControl"] {
+        button[kind="header"], [data-testid="collapsedControl"], [data-testid="stSidebarCollapseButton"] {
             display: none !important;
         }
 
-        /* Logotipo interactivo en la esquina superior izquierda (botón exclusivo para abrir/cerrar menú) */
+        /* Logotipo interactivo en la esquina superior izquierda como único disparador del menú */
         .logo-btn-container {
             position: fixed;
             top: 20px;
@@ -77,12 +77,11 @@ st.markdown("""
             text-align: left !important;
         }
 
-        /* Ocultar de forma absoluta las casillas o círculos de selección de los radio buttons */
-        [data-testid="stSidebar"] div.row-widget.stRadio div[role="radiogroup"] > label > div:first-child {
-            display: none !important;
-        }
-        
-        [data-testid="stSidebar"] div.row-widget.stRadio input[type="radio"] {
+        /* Eliminar por completo cualquier rastro de casillas, checkboxes o círculos en los radio buttons */
+        [data-testid="stSidebar"] div.row-widget.stRadio div[role="radiogroup"] > label > div:first-child,
+        [data-testid="stSidebar"] div.row-widget.stRadio input[type="radio"],
+        [data-testid="stSidebar"] .st-bp,
+        [data-testid="stSidebar"] div[data-baseweb="radio"] {
             display: none !important;
         }
 
@@ -91,7 +90,7 @@ st.markdown("""
             background-color: #161616;
             border: 2px solid #333333;
             border-radius: 8px;
-            padding: 10px 14px;
+            padding: 12px 14px;
             width: 100%;
             display: block;
             cursor: pointer;
@@ -119,20 +118,6 @@ st.markdown("""
             box-sizing: border-box;
         }
 
-        /* Asegurar centrado absoluto en todos los títulos y subtítulos del panel central */
-        .block-container h1, 
-        .block-container h2, 
-        .block-container h3, 
-        .block-container p,
-        .block-container .subtitle,
-        .center-title,
-        .center-subtitle {
-            text-align: center !important;
-            width: 100% !important;
-            margin-left: auto !important;
-            margin-right: auto !important;
-        }
-
         h1, h2, h3, p, label, .stMarkdown, span, div {
             font-family: 'Montserrat', sans-serif !important;
             color: #FFFFFF;
@@ -150,6 +135,7 @@ st.markdown("""
             font-weight: 700;
             letter-spacing: -0.03em;
             text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            text-align: center !important;
         }
 
         .subtitle {
@@ -370,7 +356,7 @@ st.markdown("""
             text-transform: uppercase;
             padding: 10px 0;
             z-index: 99998;
-            box-shadow: -2px 10px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.4);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -389,23 +375,25 @@ st.markdown(f"""
     
     <script>
         function toggleSidebar() {{
-            // Busca de forma robusta cualquier botón colapsado o de control de la barra lateral en Streamlit
-            const buttons = parent.document.querySelectorAll('button');
-            for (let btn of buttons) {{
-                const label = btn.getAttribute('aria-label') || '';
-                if (label.toLowerCase().includes('sidebar') || label.toLowerCase().includes('collapse') || btn.kind === 'header') {{
-                    btn.click();
-                    return;
-                }}
+            // Simula la acción sobre el botón de control interno de Streamlit para desplegar la barra lateral
+            const sbControl = parent.document.querySelector('[data-testid="collapsedControl"]') || 
+                              parent.document.querySelector('button[kind="header"]');
+            if (sbControl) {{
+                sbControl.click();
+            }} else {{
+                // Disparador de eventos genérico para forzar la apertura del sidebar si está colapsado
+                const event = new KeyboardEvent('keydown', {{
+                    key: 'm',
+                    ctrlKey: true,
+                    bubbles: true
+                }});
+                parent.document.dispatchEvent(event);
             }}
-            // Fallback buscando por testid o clase de control colapsado
-            const altBtn = parent.document.querySelector('[data-testid="collapsedControl"]');
-            if (altBtn) altBtn.click();
         }}
     </script>
 """, unsafe_allow_html=True)
 
-# Menú lateral adaptado sin casillas
+# Menú lateral adaptado sin casillas y perfectamente alineado
 st.sidebar.title("MENÚ")
 seccion_seleccionada = st.sidebar.radio(
     "SELECCIONA GRUPO",
@@ -733,13 +721,13 @@ DATOS_VERTEBRADOS = [
 
 # Cabecera dinámica centrada según la sección seleccionada
 if seccion_seleccionada == "VERTEBRADOS":
-    st.markdown("<h1 style='text-align: center;'>VISU VERTEBRADOS</h1>", unsafe_allow_html=True)
+    st.markdown("<h1>VISU VERTEBRADOS</h1>", unsafe_allow_html=True)
     st.markdown("<div class='subtitle'>identificación de especies</div>", unsafe_allow_html=True)
 elif seccion_seleccionada == "INVERTEBRADOS":
-    st.markdown("<h1 style='text-align: center;'>VISU INVERTEBRADOS</h1>", unsafe_allow_html=True)
+    st.markdown("<h1>VISU INVERTEBRADOS</h1>", unsafe_allow_html=True)
     st.markdown("<div class='subtitle'>no artrópodos</div>", unsafe_allow_html=True)
 else:
-    st.markdown("<h1 style='text-align: center;'>VISU ARTRÓPODOS</h1>", unsafe_allow_html=True)
+    st.markdown("<h1>VISU ARTRÓPODOS</h1>", unsafe_allow_html=True)
     st.markdown("<div class='subtitle'>insectos, arácnidos y crustáceos</div>", unsafe_allow_html=True)
 
 def normalizar_texto(texto):
@@ -906,10 +894,10 @@ if seccion_seleccionada == "VERTEBRADOS":
 
         nota = round((aciertos / total_preguntas) * 10, 1) if total_preguntas > 0 else 0
 
-        st.markdown("<h3 style='text-align: center;'>Resultados del Test Visu</h3>", unsafe_allow_html=True)
-        st.markdown(f"<p style='text-align: center;'>Aciertos totales: {aciertos}</p>", unsafe_allow_html=True)
-        st.markdown(f"<p style='text-align: center;'>Fallos totales: {fallos}</p>", unsafe_allow_html=True)
-        st.markdown(f"<h3 style='text-align: center;'>Puntuación Final: {nota} / 10</h3>", unsafe_allow_html=True)
+        st.markdown("<h3>Resultados del Test Visu</h3>", unsafe_allow_html=True)
+        st.markdown(f"<p>Aciertos totales: {aciertos}</p>", unsafe_allow_html=True)
+        st.markdown(f"<p>Fallos totales: {fallos}</p>", unsafe_allow_html=True)
+        st.markdown(f"<h3>Puntuación Final: {nota} / 10</h3>", unsafe_allow_html=True)
 
         if nota >= 5.0:
             st.balloons()
@@ -930,10 +918,10 @@ if seccion_seleccionada == "VERTEBRADOS":
 
 elif seccion_seleccionada == "INVERTEBRADOS":
     st.markdown("<br><br>", unsafe_allow_html=True)
-    st.markdown("<h3 style='text-align: center;'>MÓDULO EN DESARROLLO</h3>", unsafe_allow_html=True)
+    st.markdown("<h3>MÓDULO EN DESARROLLO</h3>", unsafe_allow_html=True)
     st.markdown("<p class='subtitle'>Próximamente disponible el test de invertebrados no artrópodos.</p>", unsafe_allow_html=True)
 
 else:
     st.markdown("<br><br>", unsafe_allow_html=True)
-    st.markdown("<h3 style='text-align: center;'>MÓDULO EN DESARROLLO</h3>", unsafe_allow_html=True)
+    st.markdown("<h3>MÓDULO EN DESARROLLO</h3>", unsafe_allow_html=True)
     st.markdown("<p class='subtitle'>Próximamente disponible el test de artrópodos.</p>", unsafe_allow_html=True)
