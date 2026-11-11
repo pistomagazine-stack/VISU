@@ -6,12 +6,12 @@ import unicodedata
 
 # Configuración de la página
 st.set_page_config(
-    page_title="Visu Zoología - UCM",
+    page_title="Visu Máster - Biología UCM",
     layout="centered",
     initial_sidebar_state="collapsed"
 )
 
-# Estilos CSS con flechas limpias sin bordes ni botones y banda inferior de redes sociales
+# Estilos CSS con flechas limpias, banda fija y diseño adaptado para el menú lateral
 st.markdown("""
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
@@ -23,7 +23,7 @@ st.markdown("""
             color: #FFFFFF;
             font-family: 'Montserrat', sans-serif;
             text-transform: uppercase;
-            padding-bottom: 120px !important; /* Espacio ampliado para hacer scroll completo sobre la banda */
+            padding-bottom: 120px !important;
         }
 
         /* Logotipo flotante */
@@ -54,6 +54,18 @@ st.markdown("""
         header[data-testid="stHeader"] {
             background: transparent !important;
             visibility: hidden;
+        }
+
+        /* Personalización de la barra lateral (Menú hamburguesa) */
+        [data-testid="stSidebar"] {
+            background-color: #0A0A0A;
+            border-right: 3px solid #FFFFFF;
+        }
+
+        [data-testid="stSidebar"] * {
+            font-family: 'Montserrat', sans-serif !important;
+            color: #FFFFFF !important;
+            text-transform: uppercase !important;
         }
 
         /* Tarjeta central estabilizada y centrada siempre */
@@ -321,6 +333,13 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
+# Menú lateral (Hamburguesa)
+st.sidebar.title("MENÚ VISU MÁSTER")
+seccion_seleccionada = st.sidebar.radio(
+    "Selecciona grupo:",
+    ["VERTEBRADOS", "INVERTEBRADOS", "ARTRÓPODOS"]
+)
+
 # Banda longitudinal inferior con las redes sociales
 st.markdown("""
     <div class="footer-band">
@@ -328,7 +347,7 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-DATOS_ESPECIES = [
+DATOS_VERTEBRADOS = [
     {"clase": "CL. MYXINI", "orden": "O. MYXINIFORMES", "especie": "Mixin (Myxine glutinosa)", "cientifico": "Myxine_glutinosa"},
     {"clase": "CL. HYPEROARTIA", "orden": "O. PETROMYZONTIFORMES", "especie": "Lamprea de mar (Petromyzon marinus)", "cientifico": "Petromyzon_marinus"},
     {"clase": "CL. HYPEROARTIA", "orden": "O. PETROMYZONTIFORMES", "especie": "Lamprea de arroyo (Lampetra fluviatilis)", "cientifico": "Lampetra_fluviatilis"},
@@ -639,8 +658,16 @@ DATOS_ESPECIES = [
     {"clase": "CL. MAMMALIA", "orden": "INFRAORDEN CETACEA", "especie": "Ballena franca (Eubalaena glacialis)", "cientifico": "Eubalaena_glacialis"}
 ]
 
-st.title("VISU ZOOLOGIA")
-st.markdown("<div class='subtitle'>identificación de especies</div>", unsafe_allow_html=True)
+# Cabecera dinámica según la sección seleccionada
+if seccion_seleccionada == "VERTEBRADOS":
+    st.title("VISU VERTEBRADOS")
+    st.markdown("<div class='subtitle'>identificación de especies</div>", unsafe_allow_html=True)
+elif seccion_seleccionada == "INVERTEBRADOS":
+    st.title("VISU INVERTEBRADOS")
+    st.markdown("<div class='subtitle'>no artrópodos</div>", unsafe_allow_html=True)
+else:
+    st.title("VISU ARTRÓPODOS")
+    st.markdown("<div class='subtitle'>insectos, arácnidos y crustáceos</div>", unsafe_allow_html=True)
 
 def normalizar_texto(texto):
     """Elimina tildes, convierte a minúsculas y limpia espacios."""
@@ -651,6 +678,7 @@ def normalizar_texto(texto):
     return sin_tildes.strip().lower()
 
 def obtener_fotos(nombre_especie, max_fotos=2):
+    # Aquí puedes cambiar "IMAGENES" por "IMAGENES_VERTEBRADOS" cuando organices tus carpetas
     carpeta_base = Path("IMAGENES") / nombre_especie
     fotos = []
     
@@ -679,148 +707,161 @@ def obtener_fotos(nombre_especie, max_fotos=2):
                 
     return fotos
 
-if 'sesion' not in st.session_state:
-    cantidad_preguntas = min(10, len(DATOS_ESPECIES))
-    st.session_state.sesion = random.sample(DATOS_ESPECIES, cantidad_preguntas)
-    st.session_state.idx = 0
-    st.session_state.aciertos = 0
-    st.session_state.fallos = 0
-    st.session_state.estado_respuesta = None
-    st.session_state.temp_c = ""
-    st.session_state.temp_o = ""
-    st.session_state.temp_e = ""
+# Lógica condicional para mostrar el contenido según la opción del menú
+if seccion_seleccionada == "VERTEBRADOS":
+    if 'sesion_vert' not in st.session_state:
+        cantidad_preguntas = min(10, len(DATOS_VERTEBRADOS))
+        st.session_state.sesion_vert = random.sample(DATOS_VERTEBRADOS, cantidad_preguntas)
+        st.session_state.idx_vert = 0
+        st.session_state.aciertos_vert = 0
+        st.session_state.fallos_vert = 0
+        st.session_state.estado_respuesta_vert = None
+        st.session_state.temp_c = ""
+        st.session_state.temp_o = ""
+        st.session_state.temp_e = ""
 
-if st.session_state.idx < len(st.session_state.sesion):
-    actual = st.session_state.sesion[st.session_state.idx]
+    if st.session_state.idx_vert < len(st.session_state.sesion_vert):
+        actual = st.session_state.sesion_vert[st.session_state.idx_vert]
 
-    if st.session_state.get("imagen_especie_actual") != actual["especie"]:
-        st.session_state.imagen_especie_actual = actual["especie"]
-        st.session_state.indice_imagen = 0
+        if st.session_state.get("imagen_especie_actual") != actual["especie"]:
+            st.session_state.imagen_especie_actual = actual["especie"]
+            st.session_state.indice_imagen = 0
 
-    fotos_pregunta = obtener_fotos(actual["especie"], max_fotos=2)
-
-    st.markdown(
-        f"<p class='pregunta-counter'>"
-        f"Pregunta {st.session_state.idx + 1} de {len(st.session_state.sesion)}</p>",
-        unsafe_allow_html=True
-    )
-
-    if fotos_pregunta:
-        st.session_state.indice_imagen = min(
-            st.session_state.indice_imagen, len(fotos_pregunta) - 1
-        )
-        
-        col_izq, col_img, col_der = st.columns([0.6, 12, 0.6], vertical_alignment="center")
-        
-        with col_izq:
-            if st.button("‹", key=f"foto_anterior_{st.session_state.idx}", type="tertiary",
-                         disabled=len(fotos_pregunta) < 2, help="Fotografía anterior"):
-                st.session_state.indice_imagen = (
-                    st.session_state.indice_imagen - 1
-                ) % len(fotos_pregunta)
-                st.rerun()
-
-        with col_img:
-            foto_actual = fotos_pregunta[st.session_state.indice_imagen]
-            st.markdown(
-                f"""<div class="img-borde">
-                    <img src="{foto_actual["url"]}" style="max-width: 100%; max-height: 400px; width: auto; height: auto; border-radius: 6px; display: block; margin: 0 auto;">
-                </div>""",
-                unsafe_allow_html=True
-            )
-
-        with col_der:
-            if st.button("›", key=f"foto_siguiente_{st.session_state.idx}", type="tertiary",
-                         disabled=len(fotos_pregunta) < 2, help="Fotografía siguiente"):
-                st.session_state.indice_imagen = (
-                    st.session_state.indice_imagen + 1
-                ) % len(fotos_pregunta)
-                st.rerun()
+        fotos_pregunta = obtener_fotos(actual["especie"], max_fotos=2)
 
         st.markdown(
             f"<p class='pregunta-counter'>"
-            f"{st.session_state.indice_imagen + 1} / {len(fotos_pregunta)}</p>",
+            f"Pregunta {st.session_state.idx_vert + 1} de {len(st.session_state.sesion_vert)}</p>",
             unsafe_allow_html=True
         )
+
+        if fotos_pregunta:
+            st.session_state.indice_imagen = min(
+                st.session_state.indice_imagen, len(fotos_pregunta) - 1
+            )
+            
+            col_izq, col_img, col_der = st.columns([0.6, 12, 0.6], vertical_alignment="center")
+            
+            with col_izq:
+                if st.button("‹", key=f"foto_anterior_{st.session_state.idx_vert}", type="tertiary",
+                             disabled=len(fotos_pregunta) < 2, help="Fotografía anterior"):
+                    st.session_state.indice_imagen = (
+                        st.session_state.indice_imagen - 1
+                    ) % len(fotos_pregunta)
+                    st.rerun()
+
+            with col_img:
+                foto_actual = fotos_pregunta[st.session_state.indice_imagen]
+                st.markdown(
+                    f"""<div class="img-borde">
+                        <img src="{foto_actual["url"]}" style="max-width: 100%; max-height: 400px; width: auto; height: auto; border-radius: 6px; display: block; margin: 0 auto;">
+                    </div>""",
+                    unsafe_allow_html=True
+                )
+
+            with col_der:
+                if st.button("›", key=f"foto_siguiente_{st.session_state.idx_vert}", type="tertiary",
+                             disabled=len(fotos_pregunta) < 2, help="Fotografía siguiente"):
+                    st.session_state.indice_imagen = (
+                        st.session_state.indice_imagen + 1
+                    ) % len(fotos_pregunta)
+                    st.rerun()
+
+            st.markdown(
+                f"<p class='pregunta-counter'>"
+                f"{st.session_state.indice_imagen + 1} / {len(fotos_pregunta)}</p>",
+                unsafe_allow_html=True
+            )
+        else:
+            st.warning("No se han encontrado fotografías locales para esta especie en su carpeta.")
+
+        if st.session_state.estado_respuesta_vert is not None:
+            val_c = actual["clase"]
+            val_o = actual["orden"]
+            val_e = actual["especie"]
+        else:
+            val_c = st.session_state.temp_c
+            val_o = st.session_state.temp_o
+            val_e = st.session_state.temp_e
+
+        c_ing = st.text_input("CLASE", value=val_c, key="input_c")
+        o_ing = st.text_input("ORDEN", value=val_o, key="input_o")
+        e_ing = st.text_input("ESPECIE", value=val_e, key="input_e")
+
+        if st.session_state.estado_respuesta_vert == 'fallo':
+            st.markdown(
+                f"<div class='feedback-error'>¡OOPS! RESPUESTA INCORRECTA.<br>"
+                f"solución: {actual['clase']} | {actual['orden']} | {actual['especie']}</div>",
+                unsafe_allow_html=True
+            )
+        elif st.session_state.estado_respuesta_vert == 'acierto':
+            st.markdown(
+                f"<div class='feedback-success'>¡RESPUESTA CORRECTA!<br>HAS IDENTIFICADO LA ESPECIE CORRECTAMENTE.</div>",
+                unsafe_allow_html=True
+            )
+
+        if st.session_state.estado_respuesta_vert is not None:
+            _, centro_siguiente, _ = st.columns([1, 2, 1])
+            with centro_siguiente:
+                siguiente = st.button("Siguiente pregunta", use_container_width=True)
+            if siguiente:
+                st.session_state.estado_respuesta_vert = None
+                st.session_state.temp_c = ""
+                st.session_state.temp_o = ""
+                st.session_state.temp_e = ""
+                st.session_state.idx_vert += 1
+                st.rerun()
+        else:
+            _, centro_comprobar, _ = st.columns([1, 2, 1])
+            with centro_comprobar:
+                comprobar = st.button("Comprobar respuesta", type="primary", use_container_width=True)
+            if comprobar:
+                clase_ok = normalizar_texto(c_ing) == normalizar_texto(actual["clase"])
+                orden_ok = normalizar_texto(o_ing) == normalizar_texto(actual["orden"])
+                especie_ok = normalizar_texto(e_ing) == normalizar_texto(actual["especie"])
+
+                if clase_ok and orden_ok and especie_ok:
+                    st.session_state.aciertos_vert += 1
+                    st.session_state.estado_respuesta_vert = 'acierto'
+                else:
+                    st.session_state.fallos_vert += 1
+                    st.session_state.estado_respuesta_vert = 'fallo'
+                st.rerun()
     else:
-        st.warning("No se han encontrado fotografías locales para esta especie en su carpeta.")
+        total_preguntas = len(st.session_state.sesion_vert)
+        aciertos = st.session_state.aciertos_vert
+        fallos = st.session_state.fallos_vert
 
-    if st.session_state.estado_respuesta is not None:
-        val_c = actual["clase"]
-        val_o = actual["orden"]
-        val_e = actual["especie"]
-    else:
-        val_c = st.session_state.temp_c
-        val_o = st.session_state.temp_o
-        val_e = st.session_state.temp_e
+        nota = round((aciertos / total_preguntas) * 10, 1) if total_preguntas > 0 else 0
 
-    c_ing = st.text_input("CLASE", value=val_c, key="input_c")
-    o_ing = st.text_input("ORDEN", value=val_o, key="input_o")
-    e_ing = st.text_input("ESPECIE", value=val_e, key="input_e")
+        st.subheader("Resultados del Test Visu")
+        st.write(f"Aciertos totales: {aciertos}")
+        st.write(f"Fallos totales: {fallos}")
+        st.markdown(f"### Puntuación Final: {nota} / 10")
 
-    if st.session_state.estado_respuesta == 'fallo':
-        st.markdown(
-            f"<div class='feedback-error'>¡OOPS! RESPUESTA INCORRECTA.<br>"
-            f"solución: {actual['clase']} | {actual['orden']} | {actual['especie']}</div>",
-            unsafe_allow_html=True
-        )
-    elif st.session_state.estado_respuesta == 'acierto':
-        st.markdown(
-            f"<div class='feedback-success'>¡RESPUESTA CORRECTA!<br>HAS IDENTIFICADO LA ESPECIE CORRECTAMENTE.</div>",
-            unsafe_allow_html=True
-        )
+        if nota >= 5.0:
+            st.balloons()
+            st.markdown("<div class='test-result'>TEST SUPERADO CON ÉXITO</div>", unsafe_allow_html=True)
+        else:
+            st.markdown("<div class='test-result fail'>TEST NO SUPERADO</div>", unsafe_allow_html=True)
+            st.markdown("<p class='subtitle'>Se recomienda repasar las especies.</p>", unsafe_allow_html=True)
 
-    if st.session_state.estado_respuesta is not None:
-        _, centro_siguiente, _ = st.columns([1, 2, 1])
-        with centro_siguiente:
-            siguiente = st.button("Siguiente pregunta", use_container_width=True)
-        if siguiente:
-            st.session_state.estado_respuesta = None
-            st.session_state.temp_c = ""
-            st.session_state.temp_o = ""
-            st.session_state.temp_e = ""
-            st.session_state.idx += 1
+        _, centro_reiniciar, _ = st.columns([1, 2, 1])
+        with centro_reiniciar:
+            reiniciar = st.button("Reiniciar test", use_container_width=True)
+        
+        if reiniciar:
+            for key in ['sesion_vert', 'idx_vert', 'aciertos_vert', 'fallos_vert', 'estado_respuesta_vert']:
+                if key in st.session_state:
+                    del st.session_state[key]
             st.rerun()
-    else:
-        _, centro_comprobar, _ = st.columns([1, 2, 1])
-        with centro_comprobar:
-            comprobar = st.button("Comprobar respuesta", type="primary", use_container_width=True)
-        if comprobar:
-            clase_ok = normalizar_texto(c_ing) == normalizar_texto(actual["clase"])
-            orden_ok = normalizar_texto(o_ing) == normalizar_texto(actual["orden"])
-            especie_ok = normalizar_texto(e_ing) == normalizar_texto(actual["especie"])
 
-            if clase_ok and orden_ok and especie_ok:
-                st.session_state.aciertos += 1
-                st.session_state.estado_respuesta = 'acierto'
-            else:
-                st.session_state.fallos += 1
-                st.session_state.estado_respuesta = 'fallo'
-            st.rerun()
+elif seccion_seleccionada == "INVERTEBRADOS":
+    st.markdown("<br><br>", unsafe_allow_html=True)
+    st.markdown("### MÓDULO EN DESARROLLO")
+    st.markdown("<p class='subtitle'>Próximamente disponible el test de invertebrados no artrópodos.</p>", unsafe_allow_html=True)
+
 else:
-    total_preguntas = len(st.session_state.sesion)
-    aciertos = st.session_state.aciertos
-    fallos = st.session_state.fallos
-
-    nota = round((aciertos / total_preguntas) * 10, 1) if total_preguntas > 0 else 0
-
-    st.subheader("Resultados del Test Visu")
-    st.write(f"Aciertos totales: {aciertos}")
-    st.write(f"Fallos totales: {fallos}")
-    st.markdown(f"### Puntuación Final: {nota} / 10")
-
-    if nota >= 5.0:
-        st.balloons()
-        st.markdown("<div class='test-result'>TEST SUPERADO CON ÉXITO</div>", unsafe_allow_html=True)
-    else:
-        st.markdown("<div class='test-result fail'>TEST NO SUPERADO</div>", unsafe_allow_html=True)
-        st.markdown("<p class='subtitle'>Se recomienda repasar las especies.</p>", unsafe_allow_html=True)
-
-    _, centro_reiniciar, _ = st.columns([1, 2, 1])
-    with centro_reiniciar:
-        reiniciar = st.button("Reiniciar test", use_container_width=True)
-    
-    if reiniciar:
-        for key in list(st.session_state.keys()):
-            del st.session_state[key]
-        st.rerun()
+    st.markdown("<br><br>", unsafe_allow_html=True)
+    st.markdown("### MÓDULO EN DESARROLLO")
+    st.markdown("<p class='subtitle'>Próximamente disponible el test de artrópodos.</p>", unsafe_allow_html=True)
