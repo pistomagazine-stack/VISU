@@ -39,7 +39,7 @@ st.markdown("""
             display: none !important;
         }
 
-        /* Posicionamiento del Logotipo nítido y sin bordes */
+        /* Contenedor fijo del logotipo en la esquina superior izquierda */
         .logo-wrapper {
             position: fixed;
             top: 20px;
@@ -49,15 +49,17 @@ st.markdown("""
             height: 75px;
             border-radius: 14px;
             overflow: hidden;
-            border: none;
             background: transparent;
-            background-size: contain; /* Ajusta la imagen perfectamente sin deformar */
-            background-repeat: no-repeat;
-            background-position: center;
-            /* Propiedades clave para evitar la pixelación difusa */
-            image-rendering: -webkit-optimize-contrast;
-            image-rendering: crisp-edges;
-            image-rendering: pixelated;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
         }
 
         /* Posicionamiento del Botón Único de Apertura/Cierre justo debajo del logo (separado 20px) */
@@ -430,9 +432,11 @@ clase_vert = "menu-item active" if seccion_seleccionada == "VERTEBRADOS" else "m
 clase_inv = "menu-item active" if seccion_seleccionada == "INVERTEBRADOS" else "menu-item"
 clase_art = "menu-item active" if seccion_seleccionada == "ARTRÓPODOS" else "menu-item"
 
-# 1. Logotipo estático en su posición original con renderizado nítido
+# 1. Logotipo estático con etiqueta <img> nativa para conservar la máxima nitidez
 st.markdown(f"""
-    <div class="logo-wrapper" style="background-image: url('data:image/png;base64,{logo_base64}');"></div>
+    <div class="logo-wrapper">
+        <img src="data:image/png;base64,{logo_base64}" alt="Logo">
+    </div>
 """, unsafe_allow_html=True)
 
 # 2. Botón único de apertura y cierre (flecha dinámica) ubicado justo debajo del logo
