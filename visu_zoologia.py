@@ -39,7 +39,7 @@ st.markdown("""
             display: none !important;
         }
 
-        /* Posicionamiento del Logotipo en la esquina superior izquierda (20px arriba, 20px izquierda) */
+        /* Posicionamiento del Logotipo en la esquina superior izquierda (sin bordes ni fondos) */
         .logo-wrapper {
             position: fixed;
             top: 20px;
@@ -49,8 +49,8 @@ st.markdown("""
             height: 75px;
             border-radius: 14px;
             overflow: hidden;
-            border: 3px solid #FFFFFF;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            border: none;
+            background: transparent;
             background-size: cover;
             background-position: center;
         }
@@ -71,13 +71,13 @@ st.markdown("""
             color: #FFFFFF !important;
             border: 3px solid #FFFFFF !important;
             border-radius: 10px !important;
-            font-size: 2rem !important;
+            font-size: 2.8rem !important; /* Flecha más grande y proporcionada */
             font-weight: 300 !important;
             width: 75px !important;
             height: 45px !important;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
             padding: 0 !important;
-            line-height: 1 !important;
+            line-height: 0.8 !important; /* Centrado óptico de la flecha */
             cursor: pointer !important;
             transition: all 0.2s ease;
             display: flex !important;
@@ -421,12 +421,12 @@ clase_vert = "menu-item active" if seccion_seleccionada == "VERTEBRADOS" else "m
 clase_inv = "menu-item active" if seccion_seleccionada == "INVERTEBRADOS" else "menu-item"
 clase_art = "menu-item active" if seccion_seleccionada == "ARTRÓPODOS" else "menu-item"
 
-# 1. Logotipo estático en su posición original
+# 1. Logotipo estático limpio en su posición original (sin bordes blancos)
 st.markdown(f"""
     <div class="logo-wrapper" style="background-image: url('data:image/png;base64,{logo_base64}');"></div>
 """, unsafe_allow_html=True)
 
-# 2. Botón único de apertura y cierre (flecha dinámica) ubicado justo debajo del logo
+# 2. Botón único de apertura y cierre (flecha de mayor tamaño) ubicado justo debajo del logo
 st.markdown('<div class="toggle-btn-wrapper">', unsafe_allow_html=True)
 texto_boton = "‹" if st.session_state.menu_abierto else "›"
 ayuda_boton = "Cerrar Menú" if st.session_state.menu_abierto else "Abrir Menú"
