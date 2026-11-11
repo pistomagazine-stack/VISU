@@ -4,11 +4,11 @@ from pathlib import Path
 import base64
 import unicodedata
 
-# Configuración de la página (sidebar colapsado al entrar)
+# Configuración de la página (sidebar expandido al entrar)
 st.set_page_config(
     page_title="Visu Máster - Biología UCM",
     layout="centered",
-    initial_sidebar_state="collapsed"
+    initial_sidebar_state="expanded"
 )
 
 # Estilos CSS definitivos y limpios
@@ -77,7 +77,7 @@ st.markdown("""
             text-align: left !important;
         }
 
-        /* Estilos para los textos interactivos del menú lateral (sin aspecto de botón ni casillas) */
+        /* Estilos para los textos interactivos del menú lateral */
         .menu-item {
             background-color: #161616;
             border: 2px solid #333333;
@@ -105,6 +105,27 @@ st.markdown("""
             border-color: #FFFFFF;
             background-color: #222222;
             color: #FFFFFF !important;
+        }
+
+        /* Flecha de cierre idéntica a las flechas de navegación de imágenes */
+        .close-sidebar-arrow {
+            background: transparent !important;
+            color: #FFFFFF !important;
+            border: none !important;
+            font-size: 2.5rem !important;
+            font-weight: 300 !important;
+            box-shadow: none !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: flex-start !important;
+            cursor: pointer !important;
+            padding: 0 !important;
+            margin-bottom: 15px !important;
+            line-height: 1 !important;
+            transition: color 0.2s ease;
+        }
+        .close-sidebar-arrow:hover {
+            color: #FF0000 !important;
         }
 
         /* Tarjeta central estabilizada y centrada siempre */
@@ -242,25 +263,6 @@ st.markdown("""
             color: #FFFFFF;
         }
 
-        /* Botón de cierre dentro del menú lateral */
-        .close-sidebar-btn {
-            background-color: #161616;
-            border: 2px solid #333333;
-            color: #FFFFFF;
-            padding: 8px 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            text-align: center;
-            font-weight: 600;
-            margin-bottom: 15px;
-            display: block;
-            transition: all 0.2s ease;
-        }
-        .close-sidebar-btn:hover {
-            border-color: #FF0000;
-            background-color: #222222;
-        }
-
         /* Bloques de feedback */
         .feedback-error {
             background-color: #FF0000 !important;
@@ -389,7 +391,7 @@ st.markdown("""
 # Codificar el logo en base64
 logo_base64 = __import__("base64").b64encode(open("pp_2.png", "rb").read()).decode("utf-8")
 
-# Script global en JS para el control de apertura/cierre y cambio de sección mediante los textos del menú
+# Script global en JS para el control de apertura/cierre limpio del menú
 st.markdown(f"""
     <div class="logo-btn-container" onclick="toggleSidebar()" title="Abrir / Cerrar Menú">
         <img src="data:image/png;base64,{logo_base64}" alt="Logo Menú">
@@ -398,10 +400,11 @@ st.markdown(f"""
     <script>
         function toggleSidebar() {{
             const doc = parent.document;
-            const openBtn = doc.querySelector('[data-testid="collapsedControl"]') || 
-                            doc.querySelector('button[kind="header"]');
-            if (openBtn) {{
-                openBtn.click();
+            // Busca el botón nativo colapsador de Streamlit para alternar su estado de forma infalible
+            const collapseBtns = doc.querySelectorAll('[data-testid="collapsedControl"], button[kind="header"], [data-testid="stSidebarCollapseButton"]');
+            if (collapseBtns.length > 0) {{
+                // Hacemos clic en el botón nativo disponible para forzar la apertura/cierre real
+                collapseBtns[0].click();
             }} else {{
                 const event = new KeyboardEvent('keydown', {{
                     key: 'm',
@@ -412,39 +415,34 @@ st.markdown(f"""
             }}
         }}
 
-        function seleccionarSeccion(seccion) {{
+        function cerrarSidebar() {{
             const doc = parent.document;
-            const inputs = doc.querySelectorAll('input[type="hidden"], input[type="text"]');
-            // Busca un input de Streamlit para actualizar y forzar el cambio de estado de forma limpia
-            const queryInput = doc.querySelector('input[aria-label="SELECCIONA GRUPO"]') || inputs[0];
-            
-            // Creamos un parámetro en la URL o recargamos simulando la selección
-            const url = new URL(window.location.href);
-            url.searchParams.set('grupo', seccion);
-            window.location.href = url.toString();
+            const collapseBtns = doc.querySelectorAll('[data-testid="collapsedControl"], button[kind="header"], [data-testid="stSidebarCollapseButton"]');
+            if (collapseBtns.length > 0) {{
+                collapseBtns[0].click();
+            }}
         }}
     </script>
 """, unsafe_allow_html=True)
 
-# Manejo de la sección seleccionada mediante query_params de Streamlit para que los textos actúen como enlaces directos
+# Manejo de la sección seleccionada mediante query_params
 query_params = st.query_params
 if "grupo" in query_params:
     seccion_seleccionada = query_params["grupo"]
 else:
     seccion_seleccionada = "VERTEBRADOS"
 
-# Menú lateral con textos limpios y pulsables (sin checkboxes, sin radios y sin botones de Streamlit)
+# Menú lateral con flecha de cierre minimalista y textos limpios
 st.sidebar.title("MENÚ")
 
 st.sidebar.markdown("""
-    <div class="close-sidebar-btn" onclick="parent.document.querySelector('[data-testid=\\'collapsedControl\\']')?.click() || parent.document.querySelector('button[kind=\\'header\\']')?.click()">
-        ← CERRAR MENÚ
+    <div class="close-sidebar-arrow" onclick="cerrarSidebar()" title="Cerrar Menú">
+        ‹
     </div>
 """, unsafe_allow_html=True)
 
 st.sidebar.markdown("<p style='font-size: 0.75rem; color: #FFCCCC; margin-bottom: 8px;'>SELECCIONA GRUPO</p>", unsafe_allow_html=True)
 
-# Renderizado de los textos pulsables en el sidebar
 clase_vert = "menu-item active" if seccion_seleccionada == "VERTEBRADOS" else "menu-item"
 clase_inv = "menu-item active" if seccion_seleccionada == "INVERTEBRADOS" else "menu-item"
 clase_art = "menu-item active" if seccion_seleccionada == "ARTRÓPODOS" else "menu-item"
