@@ -62,39 +62,57 @@ st.markdown("""
             display: block;
         }
 
-        /* Posicionamiento del Botón Único de Apertura/Cierre justo debajo del logo (separado 20px) */
+        /* Flecha de apertura: fija fuera del panel y sin caja */
         .toggle-btn-wrapper {
             position: fixed;
-            top: 115px; /* 20px (margen superior) + 75px (alto del logo) + 20px (separación) */
+            top: 115px;
             left: 20px;
             z-index: 1000000;
-            width: 75px;
+            width: auto;
             display: flex;
             justify-content: center;
         }
 
         .toggle-btn-wrapper div.stButton > button {
-            background: #0A0A0A !important;
+            background: transparent !important;
             color: #FFFFFF !important;
-            border: 3px solid #FFFFFF !important;
-            border-radius: 10px !important;
+            border: none !important;
+            border-radius: 0 !important;
             font-size: 2.8rem !important;
             font-weight: 300 !important;
-            width: 75px !important;
-            height: 45px !important;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            width: auto !important;
+            min-width: 0 !important;
+            height: auto !important;
+            box-shadow: none !important;
             padding: 0 !important;
-            line-height: 0.8 !important;
+            line-height: 1 !important;
             cursor: pointer !important;
-            transition: all 0.2s ease;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
+            transition: color 0.2s ease;
         }
 
         .toggle-btn-wrapper div.stButton > button:hover {
-            background-color: #222222 !important;
-            border-color: #FF0000 !important;
+            background: transparent !important;
+            color: #FF0000 !important;
+            border: none !important;
+        }
+
+        body:has(.custom-sidebar.open) .toggle-btn-wrapper {
+            display: none !important;
+        }
+
+        /* Flecha de cierre integrada en la cabecera del propio menú */
+        .sidebar-close {
+            color: #FFFFFF !important;
+            text-decoration: none !important;
+            font-size: 2.8rem;
+            font-weight: 300;
+            line-height: 1;
+            padding: 0 4px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .sidebar-close:hover {
             color: #FF0000 !important;
         }
 
@@ -103,7 +121,7 @@ st.markdown("""
             position: fixed;
             top: 0;
             left: -320px;
-            width: 300px;
+            width: min(300px, 85vw);
             height: 100vh;
             background-color: #0A0A0A;
             border-right: 3px solid #FFFFFF;
@@ -421,6 +439,12 @@ else:
 if "menu_abierto" not in st.session_state:
     st.session_state.menu_abierto = False
 
+# Cerrar el menú al pulsar la flecha integrada en su cabecera
+query_params = st.query_params
+if query_params.get("menu") == "cerrar":
+    st.session_state.menu_abierto = False
+    st.query_params.pop("menu", None)
+
 # Manejo de la sección seleccionada mediante query_params
 query_params = st.query_params
 if "grupo" in query_params:
@@ -439,13 +463,10 @@ st.markdown(f"""
     </div>
 """, unsafe_allow_html=True)
 
-# 2. Botón único de apertura y cierre (flecha dinámica) ubicado justo debajo del logo
+# 2. Flecha de apertura situada fuera del panel lateral
 st.markdown('<div class="toggle-btn-wrapper">', unsafe_allow_html=True)
-texto_boton = "‹" if st.session_state.menu_abierto else "›"
-ayuda_boton = "Cerrar Menú" if st.session_state.menu_abierto else "Abrir Menú"
-
-if st.button(texto_boton, key="btn_toggle_menu", help=ayuda_boton):
-    st.session_state.menu_abierto = not st.session_state.menu_abierto
+if st.button("›", key="btn_toggle_menu", help="Abrir menú"):
+    st.session_state.menu_abierto = True
     st.rerun()
 st.markdown('</div>', unsafe_allow_html=True)
 
@@ -457,6 +478,7 @@ sidebar_html = f"""
     <div id="customSidebar" class="{clase_sidebar_css}">
         <div class="sidebar-header">
             <h3 class="sidebar-title">MENÚ</h3>
+            <a class="sidebar-close" href="?grupo={seccion_seleccionada}&menu=cerrar" aria-label="Cerrar menú" title="Cerrar menú">‹</a>
         </div>
         <p style='font-size: 0.75rem; color: #FFCCCC; margin-bottom: 8px;'>SELECCIONA GRUPO</p>
         <a href="?grupo=VERTEBRADOS" class="{clase_vert}">VERTEBRADOS</a>
