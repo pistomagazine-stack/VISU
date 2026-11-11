@@ -66,13 +66,13 @@ st.markdown("""
         .toggle-btn-wrapper {
             position: fixed;
             top: 20px;
-            left: 115px; /* 20px de margen del logo + 75px de ancho + 20px de separación */
+            left: 95px; /* Justo al terminar el logotipo: 20px + 75px */
             z-index: 1000000;
             width: 30px;
             height: 75px;
             display: flex;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
         }
 
         .toggle-btn-wrapper a {
