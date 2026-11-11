@@ -11,7 +11,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Estilos CSS con flechas limpias, banda fija y diseño adaptado para el menú lateral
+# Estilos CSS generales, logotipo flotante y barra lateral
 st.markdown("""
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
@@ -26,7 +26,7 @@ st.markdown("""
             padding-bottom: 120px !important;
         }
 
-        /* Logotipo flotante */
+        /* Logotipo flotante de la revista (esquina superior izquierda) */
         .logo-container {
             position: fixed;
             top: 20px;
@@ -41,6 +41,7 @@ st.markdown("""
             display: flex;
             align-items: center;
             justify-content: center;
+            pointer-events: none; /* Para que no interfiera con clics si hiciera falta */
         }
 
         .logo-container img {
@@ -50,10 +51,14 @@ st.markdown("""
             border-radius: 14px;
         }
 
-        /* Ocultar el header superior nativo de Streamlit */
+        /* Ocultar el header superior nativo de Streamlit pero dejar espacio para el botón de la barra lateral */
         header[data-testid="stHeader"] {
             background: transparent !important;
-            visibility: hidden;
+        }
+        
+        /* Forzar que el botón de despliegue de la barra lateral sea visible y esté bien colocado */
+        [data-testid="stSidebarNav"] {
+            background-color: transparent;
         }
 
         /* Personalización de la barra lateral (Menú hamburguesa) */
@@ -326,14 +331,14 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Logotipo flotante
+# Logotipo flotante de la revista en su sitio (esquina superior izquierda)
 st.markdown("""
     <div class="logo-container">
         <img src="data:image/png;base64,""" + __import__("base64").b64encode(open("pp_2.png", "rb").read()).decode("utf-8") + """" alt="Logo">
     </div>
 """, unsafe_allow_html=True)
 
-# Menú lateral (Hamburguesa)
+# Menú lateral (Hamburguesa nativo de Streamlit)
 st.sidebar.title("MENÚ VISU MÁSTER")
 seccion_seleccionada = st.sidebar.radio(
     "Selecciona grupo:",
@@ -678,7 +683,6 @@ def normalizar_texto(texto):
     return sin_tildes.strip().lower()
 
 def obtener_fotos(nombre_especie, max_fotos=2):
-    # Aquí puedes cambiar "IMAGENES" por "IMAGENES_VERTEBRADOS" cuando organices tus carpetas
     carpeta_base = Path("IMAGENES") / nombre_especie
     fotos = []
     
@@ -854,7 +858,7 @@ if seccion_seleccionada == "VERTEBRADOS":
             for key in ['sesion_vert', 'idx_vert', 'aciertos_vert', 'fallos_vert', 'estado_respuesta_vert']:
                 if key in st.session_state:
                     del st.session_state[key]
-            st.rerun()
+                st.rerun()
 
 elif seccion_seleccionada == "INVERTEBRADOS":
     st.markdown("<br><br>", unsafe_allow_html=True)
