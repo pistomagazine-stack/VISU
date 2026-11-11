@@ -65,11 +65,13 @@ st.markdown("""
         /* Flecha de apertura: fija fuera del panel y sin caja */
         .toggle-btn-wrapper {
             position: fixed;
-            top: 115px;
-            left: 20px;
+            top: 20px;
+            left: 115px; /* 20px de margen del logo + 75px de ancho + 20px de separación */
             z-index: 1000000;
-            width: 75px;
+            width: 30px;
+            height: 75px;
             display: flex;
+            align-items: center;
             justify-content: center;
         }
 
