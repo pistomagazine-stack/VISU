@@ -11,7 +11,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Estilos CSS definitivos
+# Estilos CSS definitivos para forzar la desaparición de cualquier checkbox o círculo de radio
 st.markdown("""
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
@@ -77,40 +77,37 @@ st.markdown("""
             text-align: left !important;
         }
 
-        /* Eliminación total y absoluta de checkboxes o círculos en los radio buttons */
-        [data-testid="stSidebar"] div.row-widget.stRadio div[role="radiogroup"] > label > div:first-child,
-        [data-testid="stSidebar"] div.row-widget.stRadio input[type="radio"],
-        [data-testid="stSidebar"] .st-bp,
+        /* ELIMINACIÓN RADICAL Y TOTAL DE CUALQUIER CHECKBOX O RADIO BUTTON */
+        [data-testid="stSidebar"] input[type="radio"],
+        [data-testid="stSidebar"] input[type="checkbox"],
         [data-testid="stSidebar"] div[data-baseweb="radio"],
-        [data-testid="stSidebar"] div[data-testid="stMarkdownContainer"] input {
+        [data-testid="stSidebar"] div[role="radiogroup"] svg,
+        [data-testid="stSidebar"] div[role="radiogroup"] span,
+        [data-testid="stSidebar"] .st-bp {
             display: none !important;
-            opacity: 0 !important;
             width: 0 !important;
             height: 0 !important;
-        }
-
-        /* Forzar ocultación de cualquier input nativo residual de radio en el sidebar */
-        [data-testid="stSidebar"] input[type="radio"] {
-            display: none !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
         }
 
         /* Estilo de tarjeta limpia para las opciones del menú lateral */
         [data-testid="stSidebar"] div.row-widget.stRadio label {
-            background-color: #161616;
-            border: 2px solid #333333;
-            border-radius: 8px;
-            padding: 12px 14px;
-            width: 100%;
-            display: block;
-            cursor: pointer;
-            transition: all 0.2s ease;
+            background-color: #161616 !important;
+            border: 2px solid #333333 !important;
+            border-radius: 8px !important;
+            padding: 12px 14px !important;
+            width: 100% !important;
+            display: block !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
             text-align: left !important;
-            margin-bottom: 8px;
+            margin-bottom: 8px !important;
         }
 
         [data-testid="stSidebar"] div.row-widget.stRadio label:hover {
-            border-color: #FF0000;
-            background-color: #222222;
+            border-color: #FF0000 !important;
+            background-color: #222222 !important;
         }
 
         /* Tarjeta central estabilizada y centrada siempre */
@@ -395,7 +392,7 @@ st.markdown("""
 # Codificar el logo en base64
 logo_base64 = __import__("base64").b64encode(open("pp_2.png", "rb").read()).decode("utf-8")
 
-# Logotipo interactivo en la esquina superior izquierda (actúa como interruptor para abrir/cerrar)
+# Script global en JS para purgar dinámicamente los inputs de tipo radio del sidebar en cuanto aparezcan
 st.markdown(f"""
     <div class="logo-btn-container" onclick="toggleSidebar()" title="Abrir / Cerrar Menú">
         <img src="data:image/png;base64,{logo_base64}" alt="Logo Menú">
@@ -403,14 +400,12 @@ st.markdown(f"""
     
     <script>
         function toggleSidebar() {{
-            // Simula la pulsación en el botón nativo de Streamlit para alternar el estado del sidebar
             const doc = parent.document;
             const openBtn = doc.querySelector('[data-testid="collapsedControl"]') || 
                             doc.querySelector('button[kind="header"]');
             if (openBtn) {{
                 openBtn.click();
             }} else {{
-                // Método alternativo mediante atajo de teclado simulado si el botón no está visible
                 const event = new KeyboardEvent('keydown', {{
                     key: 'm',
                     ctrlKey: true,
@@ -419,13 +414,19 @@ st.markdown(f"""
                 doc.dispatchEvent(event);
             }}
         }}
+
+        // Observer para eliminar de forma fulminante cualquier círculo o input de radio residual
+        const observer = new MutationObserver(() => {{
+            const radios = parent.document.querySelectorAll('[data-testid="stSidebar"] input[type="radio"], [data-testid="stSidebar"] div[data-baseweb="radio"]');
+            radios.forEach(el => el.remove());
+        }});
+        observer.observe(parent.document.body, {{ childList: true, subtree: true }});
     </script>
 """, unsafe_allow_html=True)
 
 # Menú lateral adaptado sin casillas y con botón de cierre con flecha
 st.sidebar.title("MENÚ")
 
-# Botón interactivo de cierre dentro del panel lateral con símbolo de flecha
 st.sidebar.markdown("""
     <div class="close-sidebar-btn" onclick="parent.document.querySelector('[data-testid=\\'collapsedControl\\']')?.click() || parent.document.querySelector('button[kind=\\'header\\']')?.click()">
         ← CERRAR MENÚ
