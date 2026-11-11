@@ -73,34 +73,25 @@ st.markdown("""
             justify-content: center;
         }
 
-        .toggle-btn-wrapper div.stButton > button {
-            background: transparent !important;
+        .toggle-btn-wrapper a {
             color: #FFFFFF !important;
-            border: none !important;
-            border-radius: 0 !important;
-            font-size: 2.8rem !important;
-            font-weight: 300 !important;
-            width: auto !important;
-            min-width: 0 !important;
-            height: auto !important;
-            box-shadow: none !important;
-            padding: 0 !important;
-            line-height: 1 !important;
-            cursor: pointer !important;
-            transition: color 0.2s ease;
+            text-decoration: none !important;
+            font-size: 2.8rem;
+            font-weight: 300;
+            line-height: 1;
+            cursor: pointer;
         }
 
-        .toggle-btn-wrapper div.stButton > button:hover {
-            background: transparent !important;
+        .toggle-btn-wrapper a:hover,
+        .sidebar-close:hover {
             color: #FF0000 !important;
-            border: none !important;
         }
 
-        body:has(.custom-sidebar.open) .toggle-btn-wrapper {
+        body:has(#customSidebar:target) .toggle-btn-wrapper {
             display: none !important;
         }
 
-        /* Flecha de cierre integrada en la cabecera del propio menú */
+        /* Flecha de cierre dentro de la cabecera del panel */
         .sidebar-close {
             color: #FFFFFF !important;
             text-decoration: none !important;
@@ -110,45 +101,6 @@ st.markdown("""
             padding: 0 4px;
             cursor: pointer;
             flex-shrink: 0;
-        }
-
-        .sidebar-close:hover {
-            color: #FF0000 !important;
-        }
-
-        /* Botón de cierre nativo, sin navegación ni recarga del navegador */
-        .close-btn-wrapper {
-            position: fixed;
-            top: 13px;
-            left: min(245px, calc(85vw - 55px));
-            z-index: 1000001;
-            display: none;
-        }
-
-        body:has(.custom-sidebar.open) .close-btn-wrapper {
-            display: block;
-        }
-
-        .close-btn-wrapper div.stButton > button {
-            background: transparent !important;
-            color: #FFFFFF !important;
-            border: none !important;
-            border-radius: 0 !important;
-            font-size: 2.8rem !important;
-            font-weight: 300 !important;
-            width: auto !important;
-            min-width: 0 !important;
-            height: auto !important;
-            box-shadow: none !important;
-            padding: 0 !important;
-            line-height: 1 !important;
-            cursor: pointer !important;
-        }
-
-        .close-btn-wrapper div.stButton > button:hover {
-            background: transparent !important;
-            color: #FF0000 !important;
-            border: none !important;
         }
 
         /* Panel lateral personalizado flotante (Inicia oculto a la izquierda) */
@@ -168,7 +120,7 @@ st.markdown("""
             overflow-y: auto;
         }
 
-        .custom-sidebar.open {
+        .custom-sidebar:target {
             left: 0;
         }
 
@@ -470,11 +422,7 @@ if logo_path.exists():
 else:
     logo_base64 = ""
 
-# Inicializar estado del menú flotante si no existe
-if "menu_abierto" not in st.session_state:
-    st.session_state.menu_abierto = False
-
-# Manejo de la sección seleccionada mediante query_params
+# Sección seleccionada mediante query_params
 query_params = st.query_params
 if "grupo" in query_params:
     seccion_seleccionada = query_params["grupo"]
@@ -492,28 +440,15 @@ st.markdown(f"""
     </div>
 """, unsafe_allow_html=True)
 
-# 2. Flecha de apertura situada fuera del panel lateral
-st.markdown('<div class="toggle-btn-wrapper">', unsafe_allow_html=True)
-if st.button("›", key="btn_toggle_menu", help="Abrir menú"):
-    st.session_state.menu_abierto = True
-    st.rerun()
-st.markdown('</div>', unsafe_allow_html=True)
+# 2. Flecha de apertura fuera del panel. El fragmento #customSidebar abre el panel sin recargar.
+st.markdown('<div class="toggle-btn-wrapper"><a href="#customSidebar" aria-label="Abrir menú">›</a></div>', unsafe_allow_html=True)
 
-# 3. Flecha de cierre: botón nativo, sin cambiar la URL ni recargar el navegador
-st.markdown('<div class="close-btn-wrapper">', unsafe_allow_html=True)
-if st.button("‹", key="btn_close_menu", help="Cerrar menú"):
-    st.session_state.menu_abierto = False
-    st.rerun()
-st.markdown('</div>', unsafe_allow_html=True)
-
-# Estado de la clase 'open' del menú según session_state
-clase_sidebar_css = "custom-sidebar open" if st.session_state.menu_abierto else "custom-sidebar"
-
-# Renderizado del panel lateral flotante personalizado
+# 3. Panel lateral; la flecha de cierre está integrada en su cabecera.
 sidebar_html = f"""
-    <div id="customSidebar" class="{clase_sidebar_css}">
+    <div id="customSidebar" class="custom-sidebar">
         <div class="sidebar-header">
             <h3 class="sidebar-title">MENÚ</h3>
+            <a href="#" class="sidebar-close" aria-label="Cerrar menú">‹</a>
         </div>
         <p style='font-size: 0.75rem; color: #FFCCCC; margin-bottom: 8px;'>SELECCIONA GRUPO</p>
         <a href="?grupo=VERTEBRADOS" class="{clase_vert}">VERTEBRADOS</a>
