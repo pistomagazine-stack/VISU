@@ -70,7 +70,7 @@ st.markdown("""
             z-index: 1000000;
             width: 75px;
             display: flex;
-            justify-content: flex-end;
+            justify-content: center;
         }
 
         .toggle-btn-wrapper a {
