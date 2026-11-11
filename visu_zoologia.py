@@ -116,6 +116,41 @@ st.markdown("""
             color: #FF0000 !important;
         }
 
+        /* Botón de cierre nativo, sin navegación ni recarga del navegador */
+        .close-btn-wrapper {
+            position: fixed;
+            top: 13px;
+            left: min(245px, calc(85vw - 55px));
+            z-index: 1000001;
+            display: none;
+        }
+
+        body:has(.custom-sidebar.open) .close-btn-wrapper {
+            display: block;
+        }
+
+        .close-btn-wrapper div.stButton > button {
+            background: transparent !important;
+            color: #FFFFFF !important;
+            border: none !important;
+            border-radius: 0 !important;
+            font-size: 2.8rem !important;
+            font-weight: 300 !important;
+            width: auto !important;
+            min-width: 0 !important;
+            height: auto !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+            line-height: 1 !important;
+            cursor: pointer !important;
+        }
+
+        .close-btn-wrapper div.stButton > button:hover {
+            background: transparent !important;
+            color: #FF0000 !important;
+            border: none !important;
+        }
+
         /* Panel lateral personalizado flotante (Inicia oculto a la izquierda) */
         .custom-sidebar {
             position: fixed;
@@ -439,12 +474,6 @@ else:
 if "menu_abierto" not in st.session_state:
     st.session_state.menu_abierto = False
 
-# Cerrar el menú al pulsar la flecha integrada en su cabecera
-query_params = st.query_params
-if query_params.get("menu") == "cerrar":
-    st.session_state.menu_abierto = False
-    st.query_params.pop("menu", None)
-
 # Manejo de la sección seleccionada mediante query_params
 query_params = st.query_params
 if "grupo" in query_params:
@@ -470,6 +499,13 @@ if st.button("›", key="btn_toggle_menu", help="Abrir menú"):
     st.rerun()
 st.markdown('</div>', unsafe_allow_html=True)
 
+# 3. Flecha de cierre: botón nativo, sin cambiar la URL ni recargar el navegador
+st.markdown('<div class="close-btn-wrapper">', unsafe_allow_html=True)
+if st.button("‹", key="btn_close_menu", help="Cerrar menú"):
+    st.session_state.menu_abierto = False
+    st.rerun()
+st.markdown('</div>', unsafe_allow_html=True)
+
 # Estado de la clase 'open' del menú según session_state
 clase_sidebar_css = "custom-sidebar open" if st.session_state.menu_abierto else "custom-sidebar"
 
@@ -478,7 +514,6 @@ sidebar_html = f"""
     <div id="customSidebar" class="{clase_sidebar_css}">
         <div class="sidebar-header">
             <h3 class="sidebar-title">MENÚ</h3>
-            <a class="sidebar-close" href="?grupo={seccion_seleccionada}&menu=cerrar" aria-label="Cerrar menú" title="Cerrar menú">‹</a>
         </div>
         <p style='font-size: 0.75rem; color: #FFCCCC; margin-bottom: 8px;'>SELECCIONA GRUPO</p>
         <a href="?grupo=VERTEBRADOS" class="{clase_vert}">VERTEBRADOS</a>
