@@ -39,7 +39,7 @@ st.markdown("""
             display: none !important;
         }
 
-        /* Posicionamiento absoluto para superponer el botón de Streamlit sobre el logo */
+        /* Posicionamiento del Logotipo en la esquina superior izquierda (20px arriba, 20px izquierda) */
         .logo-wrapper {
             position: fixed;
             top: 20px;
@@ -53,7 +53,6 @@ st.markdown("""
             background: transparent;
         }
 
-        /* Estilo para que el botón de Streamlit actúe como el logotipo interactivo */
         .logo-wrapper div.stButton > button {
             width: 75px !important;
             height: 75px !important;
@@ -70,6 +69,35 @@ st.markdown("""
         .logo-wrapper div.stButton > button:hover {
             transform: scale(1.05);
             background-color: transparent !important;
+        }
+
+        /* Posicionamiento del Botón de Cierre (Flecha) justo debajo del logo, separado exactamente 20px */
+        .close-btn-wrapper {
+            position: fixed;
+            top: 115px; /* 20px (margen superior) + 75px (alto del logo) + 20px (separación) */
+            left: 20px;
+            z-index: 1000000;
+            width: 75px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .close-btn-wrapper div.stButton > button {
+            background: transparent !important;
+            color: #FFFFFF !important;
+            border: none !important;
+            font-size: 2.5rem !important;
+            font-weight: 300 !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+            line-height: 1 !important;
+            cursor: pointer !important;
+            transition: color 0.2s ease;
+        }
+
+        .close-btn-wrapper div.stButton > button:hover {
+            color: #FF0000 !important;
+            background: transparent !important;
         }
 
         /* Panel lateral personalizado flotante (Inicia oculto a la izquierda) */
@@ -107,22 +135,6 @@ st.markdown("""
             font-weight: 700;
             color: #FFFFFF;
             margin: 0;
-        }
-
-        /* Flecha de cierre minimalista */
-        .close-sidebar-arrow {
-            background: transparent !important;
-            color: #FFFFFF !important;
-            border: none !important;
-            font-size: 2.5rem !important;
-            font-weight: 300 !important;
-            cursor: pointer !important;
-            padding: 0 !important;
-            line-height: 1 !important;
-            transition: color 0.2s ease;
-        }
-        .close-sidebar-arrow:hover {
-            color: #FF0000 !important;
         }
 
         /* Estilos para los textos interactivos del menú personalizado */
@@ -427,18 +439,26 @@ st.markdown(f"""
     </style>
 """, unsafe_allow_html=True)
 
-# Botón interactivo real de Streamlit posicionado exactamente en la esquina superior izquierda
+# 1. Botón del Logotipo en la esquina superior izquierda
 with st.container():
     st.markdown('<div class="logo-wrapper">', unsafe_allow_html=True)
-    if st.button("", key="btn_toggle_menu", help="Abrir / Cerrar Menú"):
+    if st.button("", key="btn_toggle_menu", help="Abrir Menú"):
         st.session_state.menu_abierto = not st.session_state.menu_abierto
+        st.rerun()
+    st.markdown('</div>', unsafe_allow_html=True)
+
+# 2. Botón de cierre (flecha) colocado justo debajo del logotipo
+if st.session_state.menu_abierto:
+    st.markdown('<div class="close-btn-wrapper">', unsafe_allow_html=True)
+    if st.button("‹", key="btn_cerrar_sidebar", help="Cerrar Menú", type="tertiary"):
+        st.session_state.menu_abierto = False
         st.rerun()
     st.markdown('</div>', unsafe_allow_html=True)
 
 # Estado de la clase 'open' del menú según session_state
 clase_sidebar_css = "custom-sidebar open" if st.session_state.menu_abierto else "custom-sidebar"
 
-# Renderizado del panel lateral flotante personalizado con botón de cierre operativo en Python
+# Renderizado del panel lateral flotante personalizado
 sidebar_html = f"""
     <div id="customSidebar" class="{clase_sidebar_css}">
         <div class="sidebar-header">
@@ -451,26 +471,6 @@ sidebar_html = f"""
     </div>
 """
 st.markdown(sidebar_html, unsafe_allow_html=True)
-
-# Si el menú está abierto, colocamos un botón de cierre real de Streamlit dentro del panel flotante
-if st.session_state.menu_abierto:
-    st.markdown("""
-        <style>
-            .close-btn-container {
-                position: fixed;
-                top: 15px;
-                left: 260px;
-                z-index: 1000000;
-            }
-        </style>
-        <div class="close-btn-container">
-    """, unsafe_allow_html=True)
-    
-    if st.button("‹", key="btn_cerrar_sidebar", help="Cerrar Menú", type="tertiary"):
-        st.session_state.menu_abierto = False
-        st.rerun()
-        
-    st.markdown("</div>", unsafe_allow_html=True)
 
 # Banda longitudinal inferior con las redes sociales
 st.markdown("""
