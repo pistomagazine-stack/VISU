@@ -11,7 +11,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Estilos CSS avanzados para el menú, alineaciones y el logo interactivo
+# Estilos CSS generales y personalización limpia del menú lateral
 st.markdown("""
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
@@ -26,45 +26,42 @@ st.markdown("""
             padding-bottom: 120px !important;
         }
 
-        /* Ocultar elementos nativos de cabecera que no necesitamos */
+        /* Ocultar elementos nativos de cabecera que molestan */
         header[data-testid="stHeader"] {
             background: transparent !important;
         }
         
-        /* Ocultar el botón nativo de colapsar la barra lateral por defecto */
         button[kind="header"] {
             display: none !important;
         }
 
-        /* Logotipo flotante interactivo en la esquina superior derecha (funciona como botón para abrir el menú) */
+        /* Logotipo flotante limpio en la esquina superior izquierda (clicable como botón) */
         .logo-btn-container {
             position: fixed;
             top: 20px;
-            right: 20px;
+            left: 20px;
             z-index: 99999;
             width: 75px;
             height: 75px;
             border-radius: 14px;
             overflow: hidden;
-            border: 3px solid #FFFFFF;
-            background: #0A0A0A;
+            background: transparent;
             cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            transition: transform 0.2s ease, border-color 0.2s ease;
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: transform 0.2s ease;
         }
 
         .logo-btn-container:hover {
             transform: scale(1.05);
-            border-color: #FF0000;
         }
 
         .logo-btn-container img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            border-radius: 14px;
         }
 
         /* Personalización de la barra lateral (Menú) */
@@ -80,16 +77,12 @@ st.markdown("""
             text-align: left !important;
         }
 
-        /* Alinear elementos del sidebar a la izquierda de forma estricta */
-        [data-testid="stSidebar"] [data-testid="stVerticalBlock"] {
-            text-align: left !important;
+        /* Ocultar por completo los círculos/casillas de selección de los radio buttons */
+        [data-testid="stSidebar"] div.row-widget.stRadio div[role="radiogroup"] > label > div:first-child {
+            display: none !important;
         }
 
-        /* Transformar los radio buttons en enlaces de texto limpios alineados a la izquierda */
-        [data-testid="stSidebar"] div.row-widget.stRadio > div {
-            gap: 0.8rem;
-        }
-        
+        /* Estilo de tarjeta limpia para las opciones del menú */
         [data-testid="stSidebar"] div.row-widget.stRadio label {
             background-color: #161616;
             border: 2px solid #333333;
@@ -100,16 +93,12 @@ st.markdown("""
             cursor: pointer;
             transition: all 0.2s ease;
             text-align: left !important;
+            margin-bottom: 8px;
         }
 
         [data-testid="stSidebar"] div.row-widget.stRadio label:hover {
             border-color: #FF0000;
             background-color: #222222;
-        }
-
-        /* Ocultar los círculos de selección de los radio buttons */
-        [data-testid="stSidebar"] div.row-widget.stRadio input[type="radio"] {
-            display: none !important;
         }
 
         /* Tarjeta central estabilizada y centrada siempre */
@@ -373,10 +362,10 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Codificar el logo en base64 para inrustarlo en HTML puro
+# Codificar el logo en base64
 logo_base64 = __import__("base64").b64encode(open("pp_2.png", "rb").read()).decode("utf-8")
 
-# Script en JS para que al hacer clic en el logo flotante se simule el clic en el botón de colapsar sidebar de Streamlit
+# Logotipo interactivo en la esquina superior izquierda (actúa como botón para abrir/cerrar el menú)
 st.markdown(f"""
     <div class="logo-btn-container" onclick="toggleSidebar()" title="Abrir Menú">
         <img src="data:image/png;base64,{logo_base64}" alt="Logo Menú">
@@ -384,12 +373,10 @@ st.markdown(f"""
     
     <script>
         function toggleSidebar() {{
-            // Busca el botón nativo colapsado de Streamlit para alternar la barra lateral
             const btn = parent.document.querySelector('button[kind="header"]');
             if (btn) {{
                 btn.click();
             }} else {{
-                // Método alternativo buscando por atributos de aria
                 const altBtn = parent.document.querySelector('[data-testid="collapsedControl"]');
                 if (altBtn) altBtn.click();
             }}
@@ -397,7 +384,7 @@ st.markdown(f"""
     </script>
 """, unsafe_allow_html=True)
 
-# Menú lateral adaptado (Título "MENÚ" y opciones alineadas a la izquierda sin dos puntos)
+# Menú lateral adaptado
 st.sidebar.title("MENÚ")
 seccion_seleccionada = st.sidebar.radio(
     "SELECCIONA GRUPO",
