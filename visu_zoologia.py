@@ -4,14 +4,14 @@ from pathlib import Path
 import base64
 import unicodedata
 
-# Configuración de la página (sidebar expandido al entrar)
+# Configuración de la página
 st.set_page_config(
     page_title="Visu Máster - Biología UCM",
     layout="centered",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
-# Estilos CSS definitivos y limpios
+# Estilos CSS definitivos y menú lateral flotante personalizado
 st.markdown("""
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
@@ -26,7 +26,11 @@ st.markdown("""
             padding-bottom: 120px !important;
         }
 
-        /* Ocultar elementos nativos de cabecera de Streamlit */
+        /* Ocultar completamente la barra lateral nativa de Streamlit */
+        [data-testid="stSidebar"] {
+            display: none !important;
+        }
+
         header[data-testid="stHeader"] {
             background: transparent !important;
         }
@@ -35,7 +39,7 @@ st.markdown("""
             display: none !important;
         }
 
-        /* Logotipo interactivo en la esquina superior izquierda */
+        /* Logotipo interactivo en la esquina superior izquierda para abrir el menú */
         .logo-btn-container {
             position: fixed;
             top: 20px;
@@ -64,20 +68,60 @@ st.markdown("""
             border-radius: 14px;
         }
 
-        /* Personalización estricta de la barra lateral (Menú) */
-        [data-testid="stSidebar"] {
+        /* Panel lateral personalizado flotante (Inicia oculto a la izquierda) */
+        .custom-sidebar {
+            position: fixed;
+            top: 0;
+            left: -320px;
+            width: 300px;
+            height: 100vh;
             background-color: #0A0A0A;
             border-right: 3px solid #FFFFFF;
+            z-index: 999999;
+            transition: left 0.3s ease;
+            box-shadow: 10px 0 30px rgba(0,0,0,0.8);
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-y: auto;
         }
 
-        [data-testid="stSidebar"] * {
-            font-family: 'Montserrat', sans-serif !important;
+        .custom-sidebar.open {
+            left: 0;
+        }
+
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #333333;
+            padding-bottom: 10px;
+        }
+
+        .sidebar-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #FFFFFF;
+            margin: 0;
+        }
+
+        /* Flecha de cierre minimalista */
+        .close-sidebar-arrow {
+            background: transparent !important;
             color: #FFFFFF !important;
-            text-transform: uppercase !important;
-            text-align: left !important;
+            border: none !important;
+            font-size: 2.5rem !important;
+            font-weight: 300 !important;
+            cursor: pointer !important;
+            padding: 0 !important;
+            line-height: 1 !important;
+            transition: color 0.2s ease;
+        }
+        .close-sidebar-arrow:hover {
+            color: #FF0000 !important;
         }
 
-        /* Estilos para los textos interactivos del menú lateral */
+        /* Estilos para los textos interactivos del menú personalizado */
         .menu-item {
             background-color: #161616;
             border: 2px solid #333333;
@@ -107,27 +151,6 @@ st.markdown("""
             color: #FFFFFF !important;
         }
 
-        /* Flecha de cierre idéntica a las flechas de navegación de imágenes */
-        .close-sidebar-arrow {
-            background: transparent !important;
-            color: #FFFFFF !important;
-            border: none !important;
-            font-size: 2.5rem !important;
-            font-weight: 300 !important;
-            box-shadow: none !important;
-            display: inline-flex !important;
-            align-items: center !important;
-            justify-content: flex-start !important;
-            cursor: pointer !important;
-            padding: 0 !important;
-            margin-bottom: 15px !important;
-            line-height: 1 !important;
-            transition: color 0.2s ease;
-        }
-        .close-sidebar-arrow:hover {
-            color: #FF0000 !important;
-        }
-
         /* Tarjeta central estabilizada y centrada siempre */
         .block-container {
             max-width: 700px !important;
@@ -148,7 +171,6 @@ st.markdown("""
             text-transform: uppercase !important;
         }
 
-        /* Ritmo vertical y centrado estricto */
         h1, h2, h3, p, div.stTextInput, .stButton, .feedback-error, .feedback-success, .img-borde, .test-result {
             margin-top: 0 !important;
             margin-bottom: 0.75rem !important;
@@ -178,7 +200,6 @@ st.markdown("""
             text-align: center !important;
         }
 
-        /* Inputs ajustados exactamente al ancho de la imagen (450px) */
         div.stTextInput {
             text-align: center;
             max-width: 450px !important;
@@ -225,15 +246,6 @@ st.markdown("""
             opacity: 0 !important;
         }
 
-        ::-webkit-resizer {
-            display: none !important;
-        }
-
-        div.stTextInput > div > div:focus-within {
-            border-color: #FF0000;
-        }
-
-        /* Botones principales de acción */
         .stButton {
             display: flex !important;
             justify-content: center !important;
@@ -263,7 +275,6 @@ st.markdown("""
             color: #FFFFFF;
         }
 
-        /* Bloques de feedback */
         .feedback-error {
             background-color: #FF0000 !important;
             color: #000000 !important;
@@ -323,7 +334,6 @@ st.markdown("""
             text-decoration: none !important;
         }
 
-        /* Contenedor de la imagen */
         .img-borde {
             background-color: #161616;
             border: 3px solid #FFFFFF;
@@ -337,7 +347,6 @@ st.markdown("""
             margin: 0 auto;
         }
 
-        /* Flechas sin apariencia de botón */
         button[kind="tertiary"] {
             min-width: 0 !important;
             width: auto !important;
@@ -364,7 +373,6 @@ st.markdown("""
             opacity: 0.2 !important;
         }
 
-        /* Banda longitudinal inferior fija para redes sociales */
         .footer-band {
             position: fixed;
             bottom: 0;
@@ -391,40 +399,6 @@ st.markdown("""
 # Codificar el logo en base64
 logo_base64 = __import__("base64").b64encode(open("pp_2.png", "rb").read()).decode("utf-8")
 
-# Script global en JS para el control de apertura/cierre limpio del menú
-st.markdown(f"""
-    <div class="logo-btn-container" onclick="toggleSidebar()" title="Abrir / Cerrar Menú">
-        <img src="data:image/png;base64,{logo_base64}" alt="Logo Menú">
-    </div>
-    
-    <script>
-        function toggleSidebar() {{
-            const doc = parent.document;
-            // Busca el botón nativo colapsador de Streamlit para alternar su estado de forma infalible
-            const collapseBtns = doc.querySelectorAll('[data-testid="collapsedControl"], button[kind="header"], [data-testid="stSidebarCollapseButton"]');
-            if (collapseBtns.length > 0) {{
-                // Hacemos clic en el botón nativo disponible para forzar la apertura/cierre real
-                collapseBtns[0].click();
-            }} else {{
-                const event = new KeyboardEvent('keydown', {{
-                    key: 'm',
-                    ctrlKey: true,
-                    bubbles: true
-                }});
-                doc.dispatchEvent(event);
-            }}
-        }}
-
-        function cerrarSidebar() {{
-            const doc = parent.document;
-            const collapseBtns = doc.querySelectorAll('[data-testid="collapsedControl"], button[kind="header"], [data-testid="stSidebarCollapseButton"]');
-            if (collapseBtns.length > 0) {{
-                collapseBtns[0].click();
-            }}
-        }}
-    </script>
-""", unsafe_allow_html=True)
-
 # Manejo de la sección seleccionada mediante query_params
 query_params = st.query_params
 if "grupo" in query_params:
@@ -432,25 +406,37 @@ if "grupo" in query_params:
 else:
     seccion_seleccionada = "VERTEBRADOS"
 
-# Menú lateral con flecha de cierre minimalista y textos limpios
-st.sidebar.title("MENÚ")
-
-st.sidebar.markdown("""
-    <div class="close-sidebar-arrow" onclick="cerrarSidebar()" title="Cerrar Menú">
-        ‹
-    </div>
-""", unsafe_allow_html=True)
-
-st.sidebar.markdown("<p style='font-size: 0.75rem; color: #FFCCCC; margin-bottom: 8px;'>SELECCIONA GRUPO</p>", unsafe_allow_html=True)
-
 clase_vert = "menu-item active" if seccion_seleccionada == "VERTEBRADOS" else "menu-item"
 clase_inv = "menu-item active" if seccion_seleccionada == "INVERTEBRADOS" else "menu-item"
 clase_art = "menu-item active" if seccion_seleccionada == "ARTRÓPODOS" else "menu-item"
 
-st.sidebar.markdown(f"""
-    <a href="?grupo=VERTEBRADOS" class="{clase_vert}">VERTEBRADOS</a>
-    <a href="?grupo=INVERTEBRADOS" class="{clase_inv}">INVERTEBRADOS</a>
-    <a href="?grupo=ARTRÓPODOS" class="{clase_art}">ARTRÓPODOS</a>
+# Renderizado del panel lateral flotante personalizado y el botón de apertura
+st.markdown(f"""
+    <!-- Botón flotante del logotipo -->
+    <div class="logo-btn-container" onclick="toggleSidebar()" title="Abrir Menú">
+        <img src="data:image/png;base64,{logo_base64}" alt="Logo Menú">
+    </div>
+
+    <!-- Panel lateral personalizado -->
+    <div id="customSidebar" class="custom-sidebar">
+        <div class="sidebar-header">
+            <h3 class="sidebar-title">MENÚ</h3>
+            <button class="close-sidebar-arrow" onclick="toggleSidebar()" title="Cerrar Menú">‹</button>
+        </div>
+        <p style='font-size: 0.75rem; color: #FFCCCC; margin-bottom: 8px;'>SELECCIONA GRUPO</p>
+        <a href="?grupo=VERTEBRADOS" class="{clase_vert}">VERTEBRADOS</a>
+        <a href="?grupo=INVERTEBRADOS" class="{clase_inv}">INVERTEBRADOS</a>
+        <a href="?grupo=ARTRÓPODOS" class="{clase_art}">ARTRÓPODOS</a>
+    </div>
+    
+    <script>
+        function toggleSidebar() {{
+            const sidebar = parent.document.getElementById('customSidebar');
+            if (sidebar) {{
+                sidebar.classList.toggle('open');
+            }}
+        }}
+    </script>
 """, unsafe_allow_html=True)
 
 # Banda longitudinal inferior con las redes sociales
@@ -764,11 +750,11 @@ DATOS_VERTEBRADOS = [
     {"clase": "CL. MAMMALIA", "orden": "O. CETARTIODACTYLA", "especie": "Berrendo (Antilocapra americana)", "cientifico": "Antilocapra_americana"},
     {"clase": "CL. MAMMALIA", "orden": "O. CETARTIODACTYLA", "especie": "Jirafa (Giraffa camelopardalis)", "cientifico": "Giraffa_camelopardalis"},
     {"clase": "CL. MAMMALIA", "orden": "O. CETARTIODACTYLA", "especie": "Okapi (Okapia johnstoni)", "cientifico": "Okapia_johnstoni"},
-    {"clase": "CL. MAMMALIA", "orden": "INFRAORDEN CETACEA", "especie": "Delfín listado (Stenella coeruleoalba)", "cientifico": "Stenella_coeruleoalba"},
-    {"clase": "CL. MAMMALIA", "orden": "INFRAORDEN CETACEA", "especie": "Orca (Orcinus orca)", "cientifico": "Orcinus_orca"},
-    {"clase": "CL. MAMMALIA", "orden": "INFRAORDEN CETACEA", "especie": "Cachalote (Physeter macrocephalus)", "cientifico": "Physeter_macrocephalus"},
-    {"clase": "CL. MAMMALIA", "orden": "INFRAORDEN CETACEA", "especie": "Yubarta (Megaptera novaeangliae)", "cientifico": "Megaptera_novaeangliae"},
-    {"clase": "CL. MAMMALIA", "orden": "INFRAORDEN CETACEA", "especie": "Ballena franca (Eubalaena glacialis)", "cientifico": "Eubalaena_glacialis"}
+    {"clase": "CL. MAMMALIA", "orden": "O. INFRAORDEN CETACEA", "especie": "Delfín listado (Stenella coeruleoalba)", "cientifico": "Stenella_coeruleoalba"},
+    {"clase": "CL. MAMMALIA", "orden": "O. INFRAORDEN CETACEA", "especie": "Orca (Orcinus orca)", "cientifico": "Orcinus_orca"},
+    {"clase": "CL. MAMMALIA", "orden": "O. INFRAORDEN CETACEA", "especie": "Cachalote (Physeter macrocephalus)", "cientifico": "Physeter_macrocephalus"},
+    {"clase": "CL. MAMMALIA", "orden": "O. INFRAORDEN CETACEA", "especie": "Yubarta (Megaptera novaeangliae)", "cientifico": "Megaptera_novaeangliae"},
+    {"clase": "CL. MAMMALIA", "orden": "O. INFRAORDEN CETACEA", "especie": "Ballena franca (Eubalaena glacialis)", "cientifico": "Eubalaena_glacialis"}
 ]
 
 # Cabecera dinámica estrictamente centrada según la sección seleccionada
@@ -971,7 +957,7 @@ if seccion_seleccionada == "VERTEBRADOS":
 elif seccion_seleccionada == "INVERTEBRADOS":
     st.markdown("<br><br>", unsafe_allow_html=True)
     st.markdown("<h3 style='text-align: center;'>MÓDULO EN DESARROLLO</h3>", unsafe_allow_html=True)
-    st.markdown("<p class='subtitle' style='text-align: center;'>Próximamente disponible el test de invertebrados.</p>", unsafe_allow_html=True)
+    st.markdown("<p class='subtitle' style='text-align: center;'>Próximamente disponible el test de invertebrados no artrópodos.</p>", unsafe_allow_html=True)
 
 else:
     st.markdown("<br><br>", unsafe_allow_html=True)
