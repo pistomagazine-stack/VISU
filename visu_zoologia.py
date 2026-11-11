@@ -49,30 +49,14 @@ st.markdown("""
             height: 75px;
             border-radius: 14px;
             overflow: hidden;
-            border: none;
-            background: transparent;
-        }
-
-        .logo-wrapper div.stButton > button {
-            width: 75px !important;
-            height: 75px !important;
-            padding: 0 !important;
-            border-radius: 14px !important;
-            border: none !important;
-            background-size: cover !important;
-            background-position: center !important;
+            border: 3px solid #FFFFFF;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
-            cursor: pointer;
-            transition: transform 0.2s ease;
+            background-size: cover;
+            background-position: center;
         }
 
-        .logo-wrapper div.stButton > button:hover {
-            transform: scale(1.05);
-            background-color: transparent !important;
-        }
-
-        /* Posicionamiento del Botón de Cierre (Flecha) justo debajo del logo, separado exactamente 20px */
-        .close-btn-wrapper {
+        /* Posicionamiento del Botón Único de Apertura/Cierre justo debajo del logo (separado 20px) */
+        .toggle-btn-wrapper {
             position: fixed;
             top: 115px; /* 20px (margen superior) + 75px (alto del logo) + 20px (separación) */
             left: 20px;
@@ -82,22 +66,29 @@ st.markdown("""
             justify-content: center;
         }
 
-        .close-btn-wrapper div.stButton > button {
-            background: transparent !important;
+        .toggle-btn-wrapper div.stButton > button {
+            background: #0A0A0A !important;
             color: #FFFFFF !important;
-            border: none !important;
-            font-size: 2.5rem !important;
+            border: 3px solid #FFFFFF !important;
+            border-radius: 10px !important;
+            font-size: 2rem !important;
             font-weight: 300 !important;
-            box-shadow: none !important;
+            width: 75px !important;
+            height: 45px !important;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
             padding: 0 !important;
             line-height: 1 !important;
             cursor: pointer !important;
-            transition: color 0.2s ease;
+            transition: all 0.2s ease;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
         }
 
-        .close-btn-wrapper div.stButton > button:hover {
+        .toggle-btn-wrapper div.stButton > button:hover {
+            background-color: #222222 !important;
+            border-color: #FF0000 !important;
             color: #FF0000 !important;
-            background: transparent !important;
         }
 
         /* Panel lateral personalizado flotante (Inicia oculto a la izquierda) */
@@ -430,30 +421,20 @@ clase_vert = "menu-item active" if seccion_seleccionada == "VERTEBRADOS" else "m
 clase_inv = "menu-item active" if seccion_seleccionada == "INVERTEBRADOS" else "menu-item"
 clase_art = "menu-item active" if seccion_seleccionada == "ARTRÓPODOS" else "menu-item"
 
-# Inyectar imagen de fondo en el botón de Streamlit para el logo mediante CSS en caliente
+# 1. Logotipo estático en su posición original
 st.markdown(f"""
-    <style>
-        .logo-wrapper div.stButton > button {{
-            background-image: url("data:image/png;base64,{logo_base64}") !important;
-        }}
-    </style>
+    <div class="logo-wrapper" style="background-image: url('data:image/png;base64,{logo_base64}');"></div>
 """, unsafe_allow_html=True)
 
-# 1. Botón del Logotipo en la esquina superior izquierda
-with st.container():
-    st.markdown('<div class="logo-wrapper">', unsafe_allow_html=True)
-    if st.button("", key="btn_toggle_menu", help="Abrir Menú"):
-        st.session_state.menu_abierto = not st.session_state.menu_abierto
-        st.rerun()
-    st.markdown('</div>', unsafe_allow_html=True)
+# 2. Botón único de apertura y cierre (flecha dinámica) ubicado justo debajo del logo
+st.markdown('<div class="toggle-btn-wrapper">', unsafe_allow_html=True)
+texto_boton = "‹" if st.session_state.menu_abierto else "›"
+ayuda_boton = "Cerrar Menú" if st.session_state.menu_abierto else "Abrir Menú"
 
-# 2. Botón de cierre (flecha) colocado justo debajo del logotipo
-if st.session_state.menu_abierto:
-    st.markdown('<div class="close-btn-wrapper">', unsafe_allow_html=True)
-    if st.button("‹", key="btn_cerrar_sidebar", help="Cerrar Menú", type="tertiary"):
-        st.session_state.menu_abierto = False
-        st.rerun()
-    st.markdown('</div>', unsafe_allow_html=True)
+if st.button(texto_boton, key="btn_toggle_menu", help=ayuda_boton):
+    st.session_state.menu_abierto = not st.session_state.menu_abierto
+    st.rerun()
+st.markdown('</div>', unsafe_allow_html=True)
 
 # Estado de la clase 'open' del menú según session_state
 clase_sidebar_css = "custom-sidebar open" if st.session_state.menu_abierto else "custom-sidebar"
