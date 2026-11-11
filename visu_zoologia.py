@@ -68,9 +68,9 @@ st.markdown("""
             top: 115px;
             left: 20px;
             z-index: 1000000;
-            width: auto;
+            width: 75px;
             display: flex;
-            justify-content: center;
+            justify-content: flex-end;
         }
 
         .toggle-btn-wrapper a {
