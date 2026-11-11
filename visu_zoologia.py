@@ -11,7 +11,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Estilos CSS con flechas limpias sin bordes ni botones y campos de texto ajustados al ancho de la imagen
+# Estilos CSS con flechas limpias sin bordes ni botones y banda inferior de redes sociales
 st.markdown("""
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
@@ -23,6 +23,7 @@ st.markdown("""
             color: #FFFFFF;
             font-family: 'Montserrat', sans-serif;
             text-transform: uppercase;
+            padding-bottom: 60px; /* Espacio para que la banda fija no tape contenido */
         }
 
         /* Logotipo flotante */
@@ -288,6 +289,28 @@ st.markdown("""
             color: #444444 !important;
             opacity: 0.2 !important;
         }
+
+        /* Banda longitudinal inferior fija para redes sociales */
+        .footer-band {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #FF0000;
+            color: #FFFFFF;
+            text-align: center;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 0.75rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 10px 0;
+            z-index: 99998;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
     </style>
 """, unsafe_allow_html=True)
 
@@ -295,6 +318,13 @@ st.markdown("""
 st.markdown("""
     <div class="logo-container">
         <img src="data:image/png;base64,""" + __import__("base64").b64encode(open("pp_2.png", "rb").read()).decode("utf-8") + """" alt="Logo">
+    </div>
+""", unsafe_allow_html=True)
+
+# Banda longitudinal inferior con las redes sociales
+st.markdown("""
+    <div class="footer-band">
+        @PISTO.MAG [IG] &nbsp;&nbsp;|&nbsp;&nbsp; @PISTO.MAG [TIKTOK] &nbsp;&nbsp;|&nbsp;&nbsp; @PISTO_MAG [X] &nbsp;&nbsp;|&nbsp;&nbsp; @PISTOMAG [SUBSTACK]
     </div>
 """, unsafe_allow_html=True)
 
@@ -616,7 +646,6 @@ def normalizar_texto(texto):
     """Elimina tildes, convierte a minúsculas y limpia espacios."""
     if not texto:
         return ""
-    # Descompone los caracteres acentuados en carácter base + tilde y filtra la tilde (categoría Mn)
     nfkd_form = unicodedata.normalize('NFKD', texto)
     sin_tildes = "".join([c for c in nfkd_form if not unicodedata.combining(c)])
     return sin_tildes.strip().lower()
