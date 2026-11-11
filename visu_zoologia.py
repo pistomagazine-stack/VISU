@@ -23,7 +23,7 @@ st.markdown("""
             color: #FFFFFF;
             font-family: 'Montserrat', sans-serif;
             text-transform: uppercase;
-            padding-bottom: 60px; /* Espacio para que la banda fija no tape contenido */
+            padding-bottom: 120px !important; /* Espacio ampliado para hacer scroll completo sobre la banda */
         }
 
         /* Logotipo flotante */
@@ -65,7 +65,7 @@ st.markdown("""
             background-color: #0A0A0A;
             border: 3px solid #FFFFFF;
             border-radius: 16px;
-            margin: 2rem auto !important;
+            margin: 2rem auto 3rem auto !important;
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
             box-sizing: border-box;
         }
