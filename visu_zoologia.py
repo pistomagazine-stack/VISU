@@ -141,7 +141,7 @@ st.markdown("""
             color: #FFFFFF !important;
             border: 2px solid #FFFFFF !important;
             border-radius: 8px !important;
-            font-size: 1.4rem !important;
+            font-size: 1.2rem !important;
             font-weight: 600 !important;
             width: 100% !important;
             height: 42px !important;
@@ -467,7 +467,7 @@ st.markdown(f"""
 # 2. Botón principal de APERTURA (siempre visible y fijo bajo el logo con flecha hacia la derecha `›`)
 st.markdown('<div class="toggle-btn-wrapper">', unsafe_allow_html=True)
 if st.button("›", key="btn_abrir_menu", help="Abrir Menú"):
-    st.session_state.menu_abierto = not st.session_state.menu_abierto
+    st.session_state.menu_abierto = True
     st.rerun()
 st.markdown('</div>', unsafe_allow_html=True)
 
@@ -483,7 +483,7 @@ sidebar_html = f"""
 """
 st.markdown(sidebar_html, unsafe_allow_html=True)
 
-# Botón de CIERRE con flecha hacia la izquierda `‹` ubicado DENTRO del panel lateral
+# 3. Botón de CIERRE con flecha hacia la izquierda `‹` ubicado DENTRO del panel lateral
 st.markdown('<div class="sidebar-close-btn">', unsafe_allow_html=True)
 if st.button("‹ CERRAR MENÚ", key="btn_cerrar_menu", help="Cerrar Menú"):
     st.session_state.menu_abierto = False
