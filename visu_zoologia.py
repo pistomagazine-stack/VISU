@@ -971,7 +971,7 @@ if seccion_seleccionada == "VERTEBRADOS":
 elif seccion_seleccionada == "INVERTEBRADOS":
     st.markdown("<br><br>", unsafe_allow_html=True)
     st.markdown("<h3 style='text-align: center;'>MÓDULO EN DESARROLLO</h3>", unsafe_allow_html=True)
-    st.markdown("<p class='subtitle' style='text-align: center;'>Próximamente disponible el test de invertebrados no artrópodos.</p>", unsafe_allow_html=True)
+    st.markdown("<p class='subtitle' style='text-align: center;'>Próximamente disponible el test de invertebrados.</p>", unsafe_allow_html=True)
 
 else:
     st.markdown("<br><br>", unsafe_allow_html=True)
