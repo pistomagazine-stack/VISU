@@ -11,7 +11,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Estilos CSS generales, logotipo flotante y barra lateral
+# Estilos CSS avanzados para el menú, alineaciones y el logo interactivo
 st.markdown("""
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
@@ -26,42 +26,48 @@ st.markdown("""
             padding-bottom: 120px !important;
         }
 
-        /* Logotipo flotante de la revista (esquina superior izquierda) */
-        .logo-container {
+        /* Ocultar elementos nativos de cabecera que no necesitamos */
+        header[data-testid="stHeader"] {
+            background: transparent !important;
+        }
+        
+        /* Ocultar el botón nativo de colapsar la barra lateral por defecto */
+        button[kind="header"] {
+            display: none !important;
+        }
+
+        /* Logotipo flotante interactivo en la esquina superior derecha (funciona como botón para abrir el menú) */
+        .logo-btn-container {
             position: fixed;
             top: 20px;
-            left: 20px;
+            right: 20px;
             z-index: 99999;
             width: 75px;
             height: 75px;
             border-radius: 14px;
             overflow: hidden;
-            border: none;
-            background: transparent;
+            border: 3px solid #FFFFFF;
+            background: #0A0A0A;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            transition: transform 0.2s ease, border-color 0.2s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            pointer-events: none; /* Para que no interfiera con clics si hiciera falta */
         }
 
-        .logo-container img {
+        .logo-btn-container:hover {
+            transform: scale(1.05);
+            border-color: #FF0000;
+        }
+
+        .logo-btn-container img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            border-radius: 14px;
         }
 
-        /* Ocultar el header superior nativo de Streamlit pero dejar espacio para el botón de la barra lateral */
-        header[data-testid="stHeader"] {
-            background: transparent !important;
-        }
-        
-        /* Forzar que el botón de despliegue de la barra lateral sea visible y esté bien colocado */
-        [data-testid="stSidebarNav"] {
-            background-color: transparent;
-        }
-
-        /* Personalización de la barra lateral (Menú hamburguesa) */
+        /* Personalización de la barra lateral (Menú) */
         [data-testid="stSidebar"] {
             background-color: #0A0A0A;
             border-right: 3px solid #FFFFFF;
@@ -71,6 +77,39 @@ st.markdown("""
             font-family: 'Montserrat', sans-serif !important;
             color: #FFFFFF !important;
             text-transform: uppercase !important;
+            text-align: left !important;
+        }
+
+        /* Alinear elementos del sidebar a la izquierda de forma estricta */
+        [data-testid="stSidebar"] [data-testid="stVerticalBlock"] {
+            text-align: left !important;
+        }
+
+        /* Transformar los radio buttons en enlaces de texto limpios alineados a la izquierda */
+        [data-testid="stSidebar"] div.row-widget.stRadio > div {
+            gap: 0.8rem;
+        }
+        
+        [data-testid="stSidebar"] div.row-widget.stRadio label {
+            background-color: #161616;
+            border: 2px solid #333333;
+            border-radius: 8px;
+            padding: 10px 14px;
+            width: 100%;
+            display: block;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left !important;
+        }
+
+        [data-testid="stSidebar"] div.row-widget.stRadio label:hover {
+            border-color: #FF0000;
+            background-color: #222222;
+        }
+
+        /* Ocultar los círculos de selección de los radio buttons */
+        [data-testid="stSidebar"] div.row-widget.stRadio input[type="radio"] {
+            display: none !important;
         }
 
         /* Tarjeta central estabilizada y centrada siempre */
@@ -89,9 +128,12 @@ st.markdown("""
 
         h1, h2, h3, p, label, .stMarkdown, span, div {
             font-family: 'Montserrat', sans-serif !important;
-            text-align: center !important;
             color: #FFFFFF;
             text-transform: uppercase !important;
+        }
+
+        .block-container h1, .block-container h2, .block-container h3, .block-container p {
+            text-align: center !important;
         }
 
         /* Ritmo vertical */
@@ -280,7 +322,7 @@ st.markdown("""
             margin: 0 auto;
         }
 
-        /* Flechas sin apariencia de botón, sin fondo ni borde */
+        /* Flechas sin apariencia de botón */
         button[kind="tertiary"] {
             min-width: 0 !important;
             width: auto !important;
@@ -331,18 +373,36 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Logotipo flotante de la revista en su sitio (esquina superior izquierda)
-st.markdown("""
-    <div class="logo-container">
-        <img src="data:image/png;base64,""" + __import__("base64").b64encode(open("pp_2.png", "rb").read()).decode("utf-8") + """" alt="Logo">
+# Codificar el logo en base64 para inrustarlo en HTML puro
+logo_base64 = __import__("base64").b64encode(open("pp_2.png", "rb").read()).decode("utf-8")
+
+# Script en JS para que al hacer clic en el logo flotante se simule el clic en el botón de colapsar sidebar de Streamlit
+st.markdown(f"""
+    <div class="logo-btn-container" onclick="toggleSidebar()" title="Abrir Menú">
+        <img src="data:image/png;base64,{logo_base64}" alt="Logo Menú">
     </div>
+    
+    <script>
+        function toggleSidebar() {{
+            // Busca el botón nativo colapsado de Streamlit para alternar la barra lateral
+            const btn = parent.document.querySelector('button[kind="header"]');
+            if (btn) {{
+                btn.click();
+            }} else {{
+                // Método alternativo buscando por atributos de aria
+                const altBtn = parent.document.querySelector('[data-testid="collapsedControl"]');
+                if (altBtn) altBtn.click();
+            }}
+        }}
+    </script>
 """, unsafe_allow_html=True)
 
-# Menú lateral (Hamburguesa nativo de Streamlit)
-st.sidebar.title("MENÚ VISU MÁSTER")
+# Menú lateral adaptado (Título "MENÚ" y opciones alineadas a la izquierda sin dos puntos)
+st.sidebar.title("MENÚ")
 seccion_seleccionada = st.sidebar.radio(
-    "Selecciona grupo:",
-    ["VERTEBRADOS", "INVERTEBRADOS", "ARTRÓPODOS"]
+    "SELECCIONA GRUPO",
+    ["VERTEBRADOS", "INVERTEBRADOS", "ARTRÓPODOS"],
+    label_visibility="visible"
 )
 
 # Banda longitudinal inferior con las redes sociales
@@ -858,7 +918,7 @@ if seccion_seleccionada == "VERTEBRADOS":
             for key in ['sesion_vert', 'idx_vert', 'aciertos_vert', 'fallos_vert', 'estado_respuesta_vert']:
                 if key in st.session_state:
                     del st.session_state[key]
-                st.rerun()
+            st.rerun()
 
 elif seccion_seleccionada == "INVERTEBRADOS":
     st.markdown("<br><br>", unsafe_allow_html=True)
