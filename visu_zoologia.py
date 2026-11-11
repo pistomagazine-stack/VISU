@@ -62,7 +62,7 @@ st.markdown("""
             display: block;
         }
 
-        /* Posicionamiento del Botón Único de Apertura/Cierre justo debajo del logo (separado 20px) */
+        /* Posicionamiento del Botón de Apertura exclusivo para cuando el menú está CERRADO */
         .toggle-btn-wrapper {
             position: fixed;
             top: 115px; /* 20px (margen superior) + 75px (alto del logo) + 20px (separación) */
@@ -133,6 +133,29 @@ st.markdown("""
             font-weight: 700;
             color: #FFFFFF;
             margin: 0;
+        }
+
+        /* Estilo específico para el botón de cierre ubicado DENTRO de la barra lateral */
+        .sidebar-close-btn div.stButton > button {
+            background: #FF0000 !important;
+            color: #FFFFFF !important;
+            border: 2px solid #FFFFFF !important;
+            border-radius: 8px !important;
+            font-size: 1.5rem !important;
+            font-weight: 600 !important;
+            width: 100% !important;
+            height: 38px !important;
+            cursor: pointer !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            margin-bottom: 15px !important;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+        }
+
+        .sidebar-close-btn div.stButton > button:hover {
+            background-color: #D90000 !important;
+            border-color: #FFFFFF !important;
         }
 
         /* Estilos para los textos interactivos del menú personalizado */
@@ -432,39 +455,49 @@ clase_vert = "menu-item active" if seccion_seleccionada == "VERTEBRADOS" else "m
 clase_inv = "menu-item active" if seccion_seleccionada == "INVERTEBRADOS" else "menu-item"
 clase_art = "menu-item active" if seccion_seleccionada == "ARTRÓPODOS" else "menu-item"
 
-# 1. Logotipo estático con etiqueta <img> nativa para conservar la máxima nitidez
+# 1. Logotipo estático con etiqueta <img> nativa
 st.markdown(f"""
     <div class="logo-wrapper">
         <img src="data:image/png;base64,{logo_base64}" alt="Logo">
     </div>
 """, unsafe_allow_html=True)
 
-# 2. Botón único de apertura y cierre (flecha dinámica) ubicado justo debajo del logo
-st.markdown('<div class="toggle-btn-wrapper">', unsafe_allow_html=True)
-texto_boton = "‹" if st.session_state.menu_abierto else "›"
-ayuda_boton = "Cerrar Menú" if st.session_state.menu_abierto else "Abrir Menú"
-
-if st.button(texto_boton, key="btn_toggle_menu", help=ayuda_boton):
-    st.session_state.menu_abierto = not st.session_state.menu_abierto
-    st.rerun()
-st.markdown('</div>', unsafe_allow_html=True)
+# 2. Botón de APERTURA (solo se muestra flotando en pantalla cuando el menú está CERRADO)
+if not st.session_state.menu_abierto:
+    st.markdown('<div class="toggle-btn-wrapper">', unsafe_allow_html=True)
+    if st.button("›", key="btn_abrir_menu", help="Abrir Menú"):
+        st.session_state.menu_abierto = True
+        st.rerun()
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # Estado de la clase 'open' del menú según session_state
 clase_sidebar_css = "custom-sidebar open" if st.session_state.menu_abierto else "custom-sidebar"
 
 # Renderizado del panel lateral flotante personalizado
-sidebar_html = f"""
-    <div id="customSidebar" class="{clase_sidebar_css}">
-        <div class="sidebar-header">
-            <h3 class="sidebar-title">MENÚ</h3>
-        </div>
-        <p style='font-size: 0.75rem; color: #FFCCCC; margin-bottom: 8px;'>SELECCIONA GRUPO</p>
-        <a href="?grupo=VERTEBRADOS" class="{clase_vert}">VERTEBRADOS</a>
-        <a href="?grupo=INVERTEBRADOS" class="{clase_inv}">INVERTEBRADOS</a>
-        <a href="?grupo=ARTRÓPODOS" class="{clase_art}">ARTRÓPODOS</a>
+st.markdown(f'<div id="customSidebar" class="{clase_sidebar_css}">', unsafe_allow_html=True)
+
+st.markdown("""
+    <div class="sidebar-header">
+        <h3 class="sidebar-title">MENÚ</h3>
     </div>
-"""
-st.markdown(sidebar_html, unsafe_allow_html=True)
+""", unsafe_allow_html=True)
+
+# Botón de CIERRE situado DENTRO del panel lateral superior
+st.markdown('<div class="sidebar-close-btn">', unsafe_allow_html=True)
+if st.button("‹ CERRAR MENÚ", key="btn_cerrar_menu"):
+    st.session_state.menu_abierto = False
+    st.rerun()
+st.markdown('</div>', unsafe_allow_html=True)
+
+st.markdown("""
+    <p style='font-size: 0.75rem; color: #FFCCCC; margin-bottom: 8px;'>SELECCIONA GRUPO</p>
+""", unsafe_allow_html=True)
+
+st.markdown(f'<a href="?grupo=VERTEBRADOS" class="{clase_vert}">VERTEBRADOS</a>', unsafe_allow_html=True)
+st.markdown(f'<a href="?grupo=INVERTEBRADOS" class="{clase_inv}">INVERTEBRADOS</a>', unsafe_allow_html=True)
+st.markdown(f'<a href="?grupo=ARTRÓPODOS" class="{clase_art}">ARTRÓPODOS</a>', unsafe_allow_html=True)
+
+st.markdown('</div>', unsafe_allow_html=True)
 
 # Banda longitudinal inferior con las redes sociales
 st.markdown("""
