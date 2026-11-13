@@ -184,12 +184,13 @@ st.markdown("""
             margin: 2rem auto 3rem auto !important;
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
             box-sizing: border-box;
+            position: relative !important;
         }
 
-        /* Tarjeta lateral para el truco (450px de ancho, centrada verticalmente y con márgenes simétricos exactos) */
+        /* Tarjeta lateral para el truco (centrada verticalmente respecto al panel central y con simetría horizontal exacta) */
         .side-trick-card {
-            position: fixed;
-            left: calc(75vw - 50px);
+            position: absolute;
+            left: calc(25vw + 300px);
             top: 50%;
             transform: translateY(-50%);
             width: 450px;
