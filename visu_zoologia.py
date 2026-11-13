@@ -187,17 +187,17 @@ st.markdown("""
             position: relative !important;
         }
 
-        /* Tarjeta lateral para el truco (centrada verticalmente respecto al panel central y con simetría horizontal exacta) */
+        /* Tarjeta del truco: a la derecha del panel central, sin alterar su posición */
         .side-trick-card {
             position: absolute;
-            left: calc(25vw + 300px);
+            left: calc(100% + 24px);
             top: 50%;
             transform: translateY(-50%);
             width: 450px;
             background-color: #0A0A0A;
             border: 3px solid #FFFFFF;
             border-radius: 16px;
-            padding: 2rem;
+            padding: 0.75rem;
             box-sizing: border-box;
             z-index: 99997;
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
