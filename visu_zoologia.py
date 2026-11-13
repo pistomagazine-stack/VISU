@@ -184,20 +184,19 @@ st.markdown("""
             margin: 2rem auto 3rem auto !important;
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
             box-sizing: border-box;
-            position: relative !important;
         }
 
-        /* Tarjeta del truco: a la derecha del panel central, sin alterar su posición */
+        /* Tarjeta lateral para el truco (a la derecha, centrada verticalmente y con distancias simétricas exactas) */
         .side-trick-card {
-            position: absolute;
-            left: calc(100% + 24px);
+            position: fixed;
+            left: calc(75vw - 50px);
             top: 50%;
             transform: translateY(-50%);
             width: 450px;
             background-color: #0A0A0A;
             border: 3px solid #FFFFFF;
             border-radius: 16px;
-            padding: 0.75rem;
+            padding: 2rem;
             box-sizing: border-box;
             z-index: 99997;
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
