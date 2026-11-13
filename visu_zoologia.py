@@ -184,13 +184,14 @@ st.markdown("""
             margin: 2rem auto 3rem auto !important;
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
             box-sizing: border-box;
+            position: relative !important;
         }
 
-        /* Tarjeta lateral para el truco/solución (mismo formato y exactamente 450px de ancho) */
+        /* Tarjeta lateral para el truco (mismo formato, exactamente 450px de ancho, perfectamente alineada arriba) */
         .side-trick-card {
             position: absolute;
-            left: calc(50% + 380px);
-            top: 180px;
+            left: 730px;
+            top: 2rem;
             width: 450px;
             background-color: #0A0A0A;
             border: 3px solid #FFFFFF;
@@ -202,7 +203,7 @@ st.markdown("""
             text-align: center;
         }
 
-        @media (max-width: 1300px) {
+        @media (max-width: 1250px) {
             .side-trick-card {
                 position: relative !important;
                 left: auto !important;
@@ -219,7 +220,7 @@ st.markdown("""
             text-transform: uppercase !important;
         }
 
-        h1, h2, h3, p, div.stTextInput, .stButton, .feedback-success, .img-borde, .test-result {
+        h1, h2, h3, p, div.stTextInput, .stButton, .feedback-success, .feedback-error, .img-borde, .test-result {
             margin-top: 0 !important;
             margin-bottom: 0.75rem !important;
         }
@@ -342,6 +343,28 @@ st.markdown("""
             margin-right: auto !important;
         }
         .feedback-success * {
+            color: #000000 !important;
+        }
+
+        .feedback-error {
+            background-color: #FF0000 !important;
+            color: #000000 !important;
+            border: 3px solid #000000;
+            border-radius: 10px;
+            padding: 0.8rem 1rem;
+            max-width: 450px;
+            width: 100%;
+            text-align: center !important;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase !important;
+            line-height: 1.5;
+            box-sizing: border-box;
+            margin-left: auto !important;
+            margin-right: auto !important;
+        }
+        .feedback-error * {
             color: #000000 !important;
         }
 
@@ -912,16 +935,14 @@ if seccion_seleccionada == "VERTEBRADOS":
         o_ing = st.text_input("ORDEN", value=val_o, key="input_o")
         e_ing = st.text_input("ESPECIE", value=val_e, key="input_e")
 
-        # Recuadro separado a la derecha del panel central en caso de fallo
         if st.session_state.estado_respuesta_vert == 'fallo':
             st.markdown(
+                f"<div class='feedback-error'>¡RESPUESTA INCORRECTA!<br>SOLUCIÓN: {actual['clase']} | {actual['orden']} | {actual['especie']}</div>",
+                unsafe_allow_html=True
+            )
+            st.markdown(
                 f"""<div class="side-trick-card">
-                    <p style="color: #FF6666; font-weight: 700; font-size: 0.85rem; margin-bottom: 0.75rem;">¡OOPS! RESPUESTA INCORRECTA</p>
-                    <p style="font-size: 0.75rem; color: #FFFFFF; margin-bottom: 0.75rem; line-height: 1.4;">
-                        <b>SOLUCIÓN:</b><br>{actual['clase']} | {actual['orden']} | {actual['especie']}
-                    </p>
-                    <hr style="border: 0; border-top: 1px solid #333333; margin: 0.75rem 0;">
-                    <p style="font-size: 0.75rem; color: #FFCCCC; font-weight: 600; line-height: 1.4;">
+                    <p style="font-size: 0.75rem; color: #FFCCCC; font-weight: 600; line-height: 1.4; margin: 0;">
                         <b>TRUCO VISU:</b><br>{actual['truco']}
                     </p>
                 </div>""",
