@@ -172,9 +172,9 @@ st.markdown("""
             color: #FFFFFF !important;
         }
 
-        /* Tarjeta central estabilizada y centrada siempre */
+        /* Tarjeta central estabilizada y expandida para soportar el diseño de 2 columnas */
         .block-container {
-            max-width: 700px !important;
+            max-width: 1100px !important;
             width: 100% !important;
             padding: 2rem !important;
             text-align: center;
@@ -186,13 +186,24 @@ st.markdown("""
             box-sizing: border-box;
         }
 
+        /* Tarjeta lateral para el truco (mismo formato exacto que el panel central) */
+        .trick-card {
+            background-color: #0A0A0A;
+            border: 3px solid #FFFFFF;
+            border-radius: 16px;
+            padding: 2rem;
+            box-sizing: border-box;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+        }
+
         h1, h2, h3, p, label, .stMarkdown, span, div {
             font-family: 'Montserrat', sans-serif !important;
             color: #FFFFFF;
             text-transform: uppercase !important;
         }
 
-        h1, h2, h3, p, div.stTextInput, .stButton, .feedback-error, .feedback-success, .img-borde, .test-result {
+        h1, h2, h3, p, div.stTextInput, .stButton, .feedback-success, .img-borde, .test-result {
             margin-top: 0 !important;
             margin-bottom: 0.75rem !important;
         }
@@ -294,28 +305,6 @@ st.markdown("""
         .stButton > button:hover {
             background-color: #D90000;
             color: #FFFFFF;
-        }
-
-        .feedback-error {
-            background-color: #FF0000 !important;
-            color: #000000 !important;
-            border: 3px solid #000000;
-            border-radius: 10px;
-            padding: 0.8rem 1rem;
-            max-width: 450px;
-            width: 100%;
-            text-align: center !important;
-            font-family: 'Montserrat', sans-serif;
-            font-size: 0.85rem;
-            font-weight: 700;
-            text-transform: uppercase !important;
-            line-height: 1.5;
-            box-sizing: border-box;
-            margin-left: auto !important;
-            margin-right: auto !important;
-        }
-        .feedback-error * {
-            color: #000000 !important;
         }
 
         .feedback-success {
@@ -848,105 +837,183 @@ if seccion_seleccionada == "VERTEBRADOS":
 
         fotos_pregunta = obtener_fotos(actual["especie"], max_fotos=2)
 
-        st.markdown(
-            f"<p class='pregunta-counter'>"
-            f"Pregunta {st.session_state.idx_vert + 1} de {len(st.session_state.sesion_vert)}</p>",
-            unsafe_allow_html=True
-        )
+        # Diseño en 2 columnas exclusivamente cuando hay fallo
+        if st.session_state.estado_respuesta_vert == 'fallo':
+            col_izq, col_der = st.columns([1.2, 1], vertical_alignment="center")
 
-        if fotos_pregunta:
-            st.session_state.indice_imagen = min(
-                st.session_state.indice_imagen, len(fotos_pregunta) - 1
-            )
-            
-            col_izq, col_img, col_der = st.columns([0.6, 12, 0.6], vertical_alignment="center")
-            
             with col_izq:
-                if st.button("‹", key=f"foto_anterior_{st.session_state.idx_vert}", type="tertiary",
-                             disabled=len(fotos_pregunta) < 2, help="Fotografía anterior"):
-                    st.session_state.indice_imagen = (
-                        st.session_state.indice_imagen - 1
-                    ) % len(fotos_pregunta)
+                st.markdown(
+                    f"<p class='pregunta-counter'>"
+                    f"Pregunta {st.session_state.idx_vert + 1} de {len(st.session_state.sesion_vert)}</p>",
+                    unsafe_allow_html=True
+                )
+
+                if fotos_pregunta:
+                    st.session_state.indice_imagen = min(
+                        st.session_state.indice_imagen, len(fotos_pregunta) - 1
+                    )
+                    
+                    col_f_izq, col_f_img, col_f_der = st.columns([0.6, 12, 0.6], vertical_alignment="center")
+                    
+                    with col_f_izq:
+                        if st.button("‹", key=f"foto_anterior_{st.session_state.idx_vert}", type="tertiary",
+                                     disabled=len(fotos_pregunta) < 2, help="Fotografía anterior"):
+                            st.session_state.indice_imagen = (
+                                st.session_state.indice_imagen - 1
+                            ) % len(fotos_pregunta)
+                            st.rerun()
+
+                    with col_f_img:
+                        foto_actual = fotos_pregunta[st.session_state.indice_imagen]
+                        st.markdown(
+                            f"""<div class="img-borde">
+                                <img src="{foto_actual["url"]}" style="max-width: 100%; max-height: 350px; width: auto; height: auto; border-radius: 6px; display: block; margin: 0 auto;">
+                            </div>""",
+                            unsafe_allow_html=True
+                        )
+
+                    with col_f_der:
+                        if st.button("›", key=f"foto_siguiente_{st.session_state.idx_vert}", type="tertiary",
+                                     disabled=len(fotos_pregunta) < 2, help="Fotografía siguiente"):
+                            st.session_state.indice_imagen = (
+                                st.session_state.indice_imagen + 1
+                            ) % len(fotos_pregunta)
+                            st.rerun()
+
+                    st.markdown(
+                        f"<p class='pregunta-counter'>"
+                        f"{st.session_state.indice_imagen + 1} / {len(fotos_pregunta)}</p>",
+                        unsafe_allow_html=True
+                    )
+                
+                val_c = actual["clase"]
+                val_o = actual["orden"]
+                val_e = actual["especie"]
+
+                c_ing = st.text_input("CLASE", value=val_c, key="input_c")
+                o_ing = st.text_input("ORDEN", value=val_o, key="input_o")
+                e_ing = st.text_input("ESPECIE", value=val_e, key="input_e")
+
+                _, centro_siguiente, _ = st.columns([1, 2, 1])
+                with centro_siguiente:
+                    siguiente = st.button("Siguiente pregunta", use_container_width=True)
+                if siguiente:
+                    st.session_state.estado_respuesta_vert = None
+                    st.session_state.temp_c = ""
+                    st.session_state.temp_o = ""
+                    st.session_state.temp_e = ""
+                    st.session_state.idx_vert += 1
                     st.rerun()
 
-            with col_img:
-                foto_actual = fotos_pregunta[st.session_state.indice_imagen]
+            with col_der:
                 st.markdown(
-                    f"""<div class="img-borde">
-                        <img src="{foto_actual["url"]}" style="max-width: 100%; max-height: 400px; width: auto; height: auto; border-radius: 6px; display: block; margin: 0 auto;">
+                    f"""<div class="trick-card">
+                        <p style="color: #FF6666; font-weight: 700; font-size: 0.9rem; margin-bottom: 0.75rem;">¡OOPS! RESPUESTA INCORRECTA</p>
+                        <p style="font-size: 0.75rem; color: #FFFFFF; margin-bottom: 0.75rem; line-height: 1.4;">
+                            <b>SOLUCIÓN:</b><br>{actual['clase']} | {actual['orden']} | {actual['especie']}
+                        </p>
+                        <hr style="border: 0; border-top: 1px solid #333333; margin: 0.75rem 0;">
+                        <p style="font-size: 0.75rem; color: #FFCCCC; font-weight: 600; line-height: 1.4;">
+                            <b>TRUCO VISU:</b><br>{actual['truco']}
+                        </p>
                     </div>""",
                     unsafe_allow_html=True
                 )
 
-            with col_der:
-                if st.button("›", key=f"foto_siguiente_{st.session_state.idx_vert}", type="tertiary",
-                             disabled=len(fotos_pregunta) < 2, help="Fotografía siguiente"):
-                    st.session_state.indice_imagen = (
-                        st.session_state.indice_imagen + 1
-                    ) % len(fotos_pregunta)
-                    st.rerun()
-
+        else:
+            # Diseño normal de una sola columna (para preguntas activas o aciertos)
             st.markdown(
                 f"<p class='pregunta-counter'>"
-                f"{st.session_state.indice_imagen + 1} / {len(fotos_pregunta)}</p>",
-                unsafe_allow_html=True
-            )
-        else:
-            st.warning("No se han encontrado fotografías locales para esta especie en su carpeta.")
-
-        if st.session_state.estado_respuesta_vert is not None:
-            val_c = actual["clase"]
-            val_o = actual["orden"]
-            val_e = actual["especie"]
-        else:
-            val_c = st.session_state.temp_c
-            val_o = st.session_state.temp_o
-            val_e = st.session_state.temp_e
-
-        c_ing = st.text_input("CLASE", value=val_c, key="input_c")
-        o_ing = st.text_input("ORDEN", value=val_o, key="input_o")
-        e_ing = st.text_input("ESPECIE", value=val_e, key="input_e")
-
-        if st.session_state.estado_respuesta_vert == 'fallo':
-            st.markdown(
-                f"<div class='feedback-error'>¡OOPS! RESPUESTA INCORRECTA.<br>"
-                f"SOLUCIÓN: {actual['clase']} | {actual['orden']} | {actual['especie']}<br><br>"
-                f"<b>TRUCO:</b> {actual['truco']}</div>",
-                unsafe_allow_html=True
-            )
-        elif st.session_state.estado_respuesta_vert == 'acierto':
-            st.markdown(
-                f"<div class='feedback-success'>¡RESPUESTA CORRECTA!<br>HAS IDENTIFICADO LA ESPECIE CORRECTAMENTE.</div>",
+                f"Pregunta {st.session_state.idx_vert + 1} de {len(st.session_state.sesion_vert)}</p>",
                 unsafe_allow_html=True
             )
 
-        if st.session_state.estado_respuesta_vert is not None:
-            _, centro_siguiente, _ = st.columns([1, 2, 1])
-            with centro_siguiente:
-                siguiente = st.button("Siguiente pregunta", use_container_width=True)
-            if siguiente:
-                st.session_state.estado_respuesta_vert = None
-                st.session_state.temp_c = ""
-                st.session_state.temp_o = ""
-                st.session_state.temp_e = ""
-                st.session_state.idx_vert += 1
-                st.rerun()
-        else:
-            _, centro_comprobar, _ = st.columns([1, 2, 1])
-            with centro_comprobar:
-                comprobar = st.button("Comprobar respuesta", type="primary", use_container_width=True)
-            if comprobar:
-                clase_ok = normalizar_texto(c_ing) == normalizar_texto(actual["clase"])
-                orden_ok = normalizar_texto(o_ing) == normalizar_texto(actual["orden"])
-                especie_ok = normalizar_texto(e_ing) == normalizar_texto(actual["especie"])
+            if fotos_pregunta:
+                st.session_state.indice_imagen = min(
+                    st.session_state.indice_imagen, len(fotos_pregunta) - 1
+                )
+                
+                col_izq, col_img, col_der = st.columns([0.6, 12, 0.6], vertical_alignment="center")
+                
+                with col_izq:
+                    if st.button("‹", key=f"foto_anterior_{st.session_state.idx_vert}", type="tertiary",
+                                 disabled=len(fotos_pregunta) < 2, help="Fotografía anterior"):
+                        st.session_state.indice_imagen = (
+                            st.session_state.indice_imagen - 1
+                        ) % len(fotos_pregunta)
+                        st.rerun()
 
-                if clase_ok and orden_ok and especie_ok:
-                    st.session_state.aciertos_vert += 1
-                    st.session_state.estado_respuesta_vert = 'acierto'
-                else:
-                    st.session_state.fallos_vert += 1
-                    st.session_state.estado_respuesta_vert = 'fallo'
-                st.rerun()
+                with col_img:
+                    foto_actual = fotos_pregunta[st.session_state.indice_imagen]
+                    st.markdown(
+                        f"""<div class="img-borde">
+                            <img src="{foto_actual["url"]}" style="max-width: 100%; max-height: 400px; width: auto; height: auto; border-radius: 6px; display: block; margin: 0 auto;">
+                        </div>""",
+                        unsafe_allow_html=True
+                    )
+
+                with col_der:
+                    if st.button("›", key=f"foto_siguiente_{st.session_state.idx_vert}", type="tertiary",
+                                 disabled=len(fotos_pregunta) < 2, help="Fotografía siguiente"):
+                        st.session_state.indice_imagen = (
+                            st.session_state.indice_imagen + 1
+                        ) % len(fotos_pregunta)
+                        st.rerun()
+
+                st.markdown(
+                    f"<p class='pregunta-counter'>"
+                    f"{st.session_state.indice_imagen + 1} / {len(fotos_pregunta)}</p>",
+                    unsafe_allow_html=True
+                )
+            else:
+                st.warning("No se han encontrado fotografías locales para esta especie en su carpeta.")
+
+            if st.session_state.estado_respuesta_vert is not None:
+                val_c = actual["clase"]
+                val_o = actual["orden"]
+                val_e = actual["especie"]
+            else:
+                val_c = st.session_state.temp_c
+                val_o = st.session_state.temp_o
+                val_e = st.session_state.temp_e
+
+            c_ing = st.text_input("CLASE", value=val_c, key="input_c")
+            o_ing = st.text_input("ORDEN", value=val_o, key="input_o")
+            e_ing = st.text_input("ESPECIE", value=val_e, key="input_e")
+
+            if st.session_state.estado_respuesta_vert == 'acierto':
+                st.markdown(
+                    f"<div class='feedback-success'>¡RESPUESTA CORRECTA!<br>HAS IDENTIFICADO LA ESPECIE CORRECTAMENTE.</div>",
+                    unsafe_allow_html=True
+                )
+
+            if st.session_state.estado_respuesta_vert is not None:
+                _, centro_siguiente, _ = st.columns([1, 2, 1])
+                with centro_siguiente:
+                    siguiente = st.button("Siguiente pregunta", use_container_width=True)
+                if siguiente:
+                    st.session_state.estado_respuesta_vert = None
+                    st.session_state.temp_c = ""
+                    st.session_state.temp_o = ""
+                    st.session_state.temp_e = ""
+                    st.session_state.idx_vert += 1
+                    st.rerun()
+            else:
+                _, centro_comprobar, _ = st.columns([1, 2, 1])
+                with centro_comprobar:
+                    comprobar = st.button("Comprobar respuesta", type="primary", use_container_width=True)
+                if comprobar:
+                    clase_ok = normalizar_texto(c_ing) == normalizar_texto(actual["clase"])
+                    orden_ok = normalizar_texto(o_ing) == normalizar_texto(actual["orden"])
+                    especie_ok = normalizar_texto(e_ing) == normalizar_texto(actual["especie"])
+
+                    if clase_ok and orden_ok and especie_ok:
+                        st.session_state.aciertos_vert += 1
+                        st.session_state.estado_respuesta_vert = 'acierto'
+                    else:
+                        st.session_state.fallos_vert += 1
+                        st.session_state.estado_respuesta_vert = 'fallo'
+                    st.rerun()
     else:
         total_preguntas = len(st.session_state.sesion_vert)
         aciertos = st.session_state.aciertos_vert
