@@ -869,8 +869,33 @@ if seccion_seleccionada == "VERTEBRADOS":
 
         fotos_pregunta = obtener_fotos(actual["especie"], max_fotos=2)
 
-        # Definir estructura de 2 columnas: Columna izquierda (Panel Central) y Columna derecha (Tarjeta del Truco)
-        col_test, col_trick = st.columns([1.25, 1], gap="large")
+        # Invertimos el orden de las columnas: Columna izquierda (Truco) y Columna derecha (Panel Central / Test)
+        col_trick, col_test = st.columns([1, 1.25], gap="large")
+
+        with col_trick:
+            st.markdown('<div class="side-trick-card">', unsafe_allow_html=True)
+            if st.session_state.estado_respuesta_vert == 'fallo':
+                st.markdown(
+                    f"""<p style="font-size: 0.85rem; color: #FFCCCC; font-weight: 600; line-height: 1.5; margin: 0;">
+                        <b>TRUCO VISU:</b><br>{actual['truco']}
+                    </p>""",
+                    unsafe_allow_html=True
+                )
+            elif st.session_state.estado_respuesta_vert == 'acierto':
+                st.markdown(
+                    """<p style="font-size: 0.8rem; color: #80FF40; font-weight: 600; margin: 0;">
+                        ¡EXCELENTE! ¡HAS ACERTADO!
+                    </p>""",
+                    unsafe_allow_html=True
+                )
+            else:
+                st.markdown(
+                    """<p style="font-size: 0.75rem; color: #888888; font-weight: 500; margin: 0;">
+                        EL TRUCO VISU APARECERÁ AQUÍ EN CASO DE FALLAR LA PREGUNTA.
+                    </p>""",
+                    unsafe_allow_html=True
+                )
+            st.markdown('</div>', unsafe_allow_html=True)
 
         with col_test:
             st.markdown('<div class="central-panel-card">', unsafe_allow_html=True)
@@ -973,31 +998,6 @@ if seccion_seleccionada == "VERTEBRADOS":
                         st.session_state.estado_respuesta_vert = 'fallo'
                     st.rerun()
             
-            st.markdown('</div>', unsafe_allow_html=True)
-
-        with col_trick:
-            st.markdown('<div class="side-trick-card">', unsafe_allow_html=True)
-            if st.session_state.estado_respuesta_vert == 'fallo':
-                st.markdown(
-                    f"""<p style="font-size: 0.85rem; color: #FFCCCC; font-weight: 600; line-height: 1.5; margin: 0;">
-                        <b>TRUCO VISU:</b><br>{actual['truco']}
-                    </p>""",
-                    unsafe_allow_html=True
-                )
-            elif st.session_state.estado_respuesta_vert == 'acierto':
-                st.markdown(
-                    """<p style="font-size: 0.8rem; color: #80FF40; font-weight: 600; margin: 0;">
-                        ¡EXCELENTE! ¡HAS ACERTADO!
-                    </p>""",
-                    unsafe_allow_html=True
-                )
-            else:
-                st.markdown(
-                    """<p style="font-size: 0.75rem; color: #888888; font-weight: 500; margin: 0;">
-                        EL TRUCO VISU APARECERÁ AQUÍ EN CASO DE FALLAR LA PREGUNTA.
-                    </p>""",
-                    unsafe_allow_html=True
-                )
             st.markdown('</div>', unsafe_allow_html=True)
 
     else:
