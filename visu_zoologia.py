@@ -7,11 +7,11 @@ import unicodedata
 # Configuración de la página
 st.set_page_config(
     page_title="Visu Máster - Biología UCM",
-    layout="centered",
+    layout="wide",
     initial_sidebar_state="collapsed"
 )
 
-# Estilos CSS definitivos y menú lateral flotante personalizado
+# Estilos CSS definitivos
 st.markdown("""
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
@@ -62,11 +62,11 @@ st.markdown("""
             display: block;
         }
 
-        /* Flecha de apertura: fija fuera del panel y sin caja */
+        /* Flecha de apertura fuera del panel */
         .toggle-btn-wrapper {
             position: fixed;
             top: 20px;
-            left: 95px; /* Justo al terminar el logotipo: 20px + 75px */
+            left: 95px;
             z-index: 1000000;
             width: 30px;
             height: 75px;
@@ -105,7 +105,7 @@ st.markdown("""
             flex-shrink: 0;
         }
 
-        /* Panel lateral personalizado flotante (Inicia oculto a la izquierda) */
+        /* Panel lateral personalizado flotante */
         .custom-sidebar {
             position: fixed;
             top: 0;
@@ -142,7 +142,6 @@ st.markdown("""
             margin: 0;
         }
 
-        /* Estilos para los textos interactivos del menú personalizado */
         .menu-item {
             background-color: #161616;
             border: 2px solid #333333;
@@ -172,47 +171,41 @@ st.markdown("""
             color: #FFFFFF !important;
         }
 
-        /* Tarjeta central (700px de ancho máximo y centrada) */
+        /* Contenedor principal ampliado para alojar ambas tarjetas lado a lado */
         .block-container {
-            max-width: 700px !important;
+            max-width: 1250px !important;
             width: 100% !important;
             padding: 2rem !important;
-            text-align: center;
-            background-color: #0A0A0A;
-            border: 3px solid #FFFFFF;
-            border-radius: 16px;
             margin: 2rem auto 3rem auto !important;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
             box-sizing: border-box;
         }
 
-        /* Tarjeta lateral del truco: situada exactamente a la derecha del panel central y centrada verticalmente */
-        .side-trick-card {
-            position: fixed;
-            left: calc(50% + 380px);
-            top: 50%;
-            transform: translateY(-50%);
-            width: 420px;
+        /* Tarjeta para el panel central */
+        .central-panel-card {
             background-color: #0A0A0A;
             border: 3px solid #FFFFFF;
             border-radius: 16px;
             padding: 2rem;
-            box-sizing: border-box;
-            z-index: 99997;
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+            box-sizing: border-box;
             text-align: center;
+            width: 100%;
         }
 
-        @media (max-width: 1600px) {
-            .side-trick-card {
-                position: relative !important;
-                left: auto !important;
-                top: auto !important;
-                transform: none !important;
-                width: 100% !important;
-                max-width: 700px !important;
-                margin: 1.5rem auto 0 auto !important;
-            }
+        /* Tarjeta lateral para el truco */
+        .side-trick-card {
+            background-color: #0A0A0A;
+            border: 3px solid #FFFFFF;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+            box-sizing: border-box;
+            text-align: center;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
         h1, h2, h3, p, label, .stMarkdown, span, div {
@@ -464,17 +457,17 @@ clase_vert = "menu-item active" if seccion_seleccionada == "VERTEBRADOS" else "m
 clase_inv = "menu-item active" if seccion_seleccionada == "INVERTEBRADOS" else "menu-item"
 clase_art = "menu-item active" if seccion_seleccionada == "ARTRÓPODOS" else "menu-item"
 
-# 1. Logotipo estático con etiqueta <img> nativa para conservar la máxima nitidez
+# 1. Logotipo estático
 st.markdown(f"""
     <div class="logo-wrapper">
         <img src="data:image/png;base64,{logo_base64}" alt="Logo">
     </div>
 """, unsafe_allow_html=True)
 
-# 2. Flecha de apertura fuera del panel. El fragmento #customSidebar abre el panel sin recargar.
+# 2. Flecha de apertura
 st.markdown('<div class="toggle-btn-wrapper"><a href="#customSidebar" aria-label="Abrir menú">›</a></div>', unsafe_allow_html=True)
 
-# 3. Panel lateral; la flecha de cierre está integrada en su cabecera.
+# 3. Panel lateral
 sidebar_html = f"""
     <div id="customSidebar" class="custom-sidebar">
         <div class="sidebar-header">
@@ -489,7 +482,7 @@ sidebar_html = f"""
 """
 st.markdown(sidebar_html, unsafe_allow_html=True)
 
-# Banda longitudinal inferior con las redes sociales
+# Banda longitudinal inferior
 st.markdown("""
     <div class="footer-band">
         @PISTO.MAG [IG] &nbsp;&nbsp;|&nbsp;&nbsp; @PISTO.MAG [TIKTOK] &nbsp;&nbsp;|&nbsp;&nbsp; @PISTO_MAG [X] &nbsp;&nbsp;|&nbsp;&nbsp; @PISTOMAG [SUBSTACK]
@@ -800,14 +793,14 @@ DATOS_VERTEBRADOS = [
     {"clase": "CL. MAMMALIA", "orden": "O. CETARTIODACTYLA", "especie": "Berrendo (Antilocapra americana)", "cientifico": "Antilocapra_americana", "truco": "Cuernos bifurcados con estuche córneo que se muda anualmente."},
     {"clase": "CL. MAMMALIA", "orden": "O. CETARTIODACTYLA", "especie": "Jirafa (Giraffa camelopardalis)", "cientifico": "Giraffa_camelopardalis", "truco": "Cuello y extremidades muy alargadas, osicones con piel y manchas poligonales."},
     {"clase": "CL. MAMMALIA", "orden": "O. CETARTIODACTYLA", "especie": "Okapi (Okapia johnstoni)", "cientifico": "Okapia_johnstoni", "truco": "Rayas blancas horizontales en patas estilo cebra y lengua azul larga."},
-    {"clase": "CL. MAMMALIA", "orden": "O. INFRAORDEN CETACEA", "especie": "Delfín listado (Stenella coeruleoalba)", "cientifico": "Stenella_coeruleoalba", "truco": "Franja oscura azulada desde el ojo hasta el ano y flancos blanquecinos."},
+    {"clase": "CL. MAMMALIA", "orden": "O. INFRAORDEN CETACEA", "especie": "Delfín listado (Stenella coeruleoalba)", "cientifico": "Strenella_coeruleoalba", "truco": "Franja oscura azulada desde el ojo hasta el ano y flancos blanquecinos."},
     {"clase": "CL. MAMMALIA", "orden": "O. INFRAORDEN CETACEA", "especie": "Orca (Orcinus orca)", "cientifico": "Orcinus_orca", "truco": "Mancha blanca ovalada detrás del ojo, aleta dorsal gigante y contraste negro/blanco."},
     {"clase": "CL. MAMMALIA", "orden": "O. INFRAORDEN CETACEA", "especie": "Cachalote (Physeter macrocephalus)", "cientifico": "Physeter_macrocephalus", "truco": "Cabeza cuadrada gigantesca, espiráculo a la izquierda y piel arrugada."},
     {"clase": "CL. MAMMALIA", "orden": "O. INFRAORDEN CETACEA", "especie": "Yubarta (Megaptera novaeangliae)", "cientifico": "Megaptera_novaeangliae", "truco": "Aletas pectorales extraordinariamente largas con bordes serrados nudosos."},
     {"clase": "CL. MAMMALIA", "orden": "O. INFRAORDEN CETACEA", "especie": "Ballena franca (Eubalaena glacialis)", "cientifico": "Eubalaena_glacialis", "truco": "Ausencia de aleta dorsal y callosidades córneas blanquecinas en la cabeza."}
 ]
 
-# Cabecera dinámica estrictamente centrada según la sección seleccionada
+# Cabecera dinámica
 if seccion_seleccionada == "VERTEBRADOS":
     st.markdown("<h1>VISU VERTEBRADOS</h1>", unsafe_allow_html=True)
     st.markdown("<div class='subtitle'>identificación de especies</div>", unsafe_allow_html=True)
@@ -819,7 +812,6 @@ else:
     st.markdown("<div class='subtitle'>insectos, arácnidos y crustáceos</div>", unsafe_allow_html=True)
 
 def normalizar_texto(texto):
-    """Elimina tildes, convierte a minúsculas y limpia espacios."""
     if not texto:
         return ""
     nfkd_form = unicodedata.normalize('NFKD', texto)
@@ -855,7 +847,7 @@ def obtener_fotos(nombre_especie, max_fotos=2):
                 
     return fotos
 
-# Lógica condicional para mostrar el contenido según la opción del menú
+# Lógica condicional
 if seccion_seleccionada == "VERTEBRADOS":
     if 'sesion_vert' not in st.session_state:
         cantidad_preguntas = min(10, len(DATOS_VERTEBRADOS))
@@ -877,111 +869,137 @@ if seccion_seleccionada == "VERTEBRADOS":
 
         fotos_pregunta = obtener_fotos(actual["especie"], max_fotos=2)
 
-        st.markdown(
-            f"<p class='pregunta-counter'>"
-            f"Pregunta {st.session_state.idx_vert + 1} de {len(st.session_state.sesion_vert)}</p>",
-            unsafe_allow_html=True
-        )
+        # Definir estructura de 2 columnas: Columna izquierda (Panel Central) y Columna derecha (Tarjeta del Truco)
+        col_test, col_trick = st.columns([1.25, 1], gap="large")
 
-        if fotos_pregunta:
-            st.session_state.indice_imagen = min(
-                st.session_state.indice_imagen, len(fotos_pregunta) - 1
+        with col_test:
+            st.markdown('<div class="central-panel-card">', unsafe_allow_html=True)
+            
+            st.markdown(
+                f"<p class='pregunta-counter'>"
+                f"Pregunta {st.session_state.idx_vert + 1} de {len(st.session_state.sesion_vert)}</p>",
+                unsafe_allow_html=True
             )
-            
-            col_izq, col_img, col_der = st.columns([0.6, 12, 0.6], vertical_alignment="center")
-            
-            with col_izq:
-                if st.button("‹", key=f"foto_anterior_{st.session_state.idx_vert}", type="tertiary",
-                             disabled=len(fotos_pregunta) < 2, help="Fotografía anterior"):
-                    st.session_state.indice_imagen = (
-                        st.session_state.indice_imagen - 1
-                    ) % len(fotos_pregunta)
-                    st.rerun()
 
-            with col_img:
-                foto_actual = fotos_pregunta[st.session_state.indice_imagen]
+            if fotos_pregunta:
+                st.session_state.indice_imagen = min(
+                    st.session_state.indice_imagen, len(fotos_pregunta) - 1
+                )
+                
+                c_izq, c_img, c_der = st.columns([0.6, 12, 0.6], vertical_alignment="center")
+                
+                with c_izq:
+                    if st.button("‹", key=f"foto_anterior_{st.session_state.idx_vert}", type="tertiary",
+                                 disabled=len(fotos_pregunta) < 2, help="Fotografía anterior"):
+                        st.session_state.indice_imagen = (
+                            st.session_state.indice_imagen - 1
+                        ) % len(fotos_pregunta)
+                        st.rerun()
+
+                with c_img:
+                    foto_actual = fotos_pregunta[st.session_state.indice_imagen]
+                    st.markdown(
+                        f"""<div class="img-borde">
+                            <img src="{foto_actual["url"]}" style="max-width: 100%; max-height: 380px; width: auto; height: auto; border-radius: 6px; display: block; margin: 0 auto;">
+                        </div>""",
+                        unsafe_allow_html=True
+                    )
+
+                with c_der:
+                    if st.button("›", key=f"foto_siguiente_{st.session_state.idx_vert}", type="tertiary",
+                                 disabled=len(fotos_pregunta) < 2, help="Fotografía siguiente"):
+                        st.session_state.indice_imagen = (
+                            st.session_state.indice_imagen + 1
+                        ) % len(fotos_pregunta)
+                        st.rerun()
+
                 st.markdown(
-                    f"""<div class="img-borde">
-                        <img src="{foto_actual["url"]}" style="max-width: 100%; max-height: 400px; width: auto; height: auto; border-radius: 6px; display: block; margin: 0 auto;">
-                    </div>""",
+                    f"<p class='pregunta-counter'>"
+                    f"{st.session_state.indice_imagen + 1} / {len(fotos_pregunta)}</p>",
+                    unsafe_allow_html=True
+                )
+            else:
+                st.warning("No se han encontrado fotografías locales para esta especie.")
+
+            if st.session_state.estado_respuesta_vert is not None:
+                val_c = actual["clase"]
+                val_o = actual["orden"]
+                val_e = actual["especie"]
+            else:
+                val_c = st.session_state.temp_c
+                val_o = st.session_state.temp_o
+                val_e = st.session_state.temp_e
+
+            c_ing = st.text_input("CLASE", value=val_c, key="input_c")
+            o_ing = st.text_input("ORDEN", value=val_o, key="input_o")
+            e_ing = st.text_input("ESPECIE", value=val_e, key="input_e")
+
+            if st.session_state.estado_respuesta_vert == 'fallo':
+                st.markdown(
+                    f"<div class='feedback-error'>¡RESPUESTA INCORRECTA!<br>SOLUCIÓN: {actual['clase']} | {actual['orden']} | {actual['especie']}</div>",
+                    unsafe_allow_html=True
+                )
+            elif st.session_state.estado_respuesta_vert == 'acierto':
+                st.markdown(
+                    f"<div class='feedback-success'>¡RESPUESTA CORRECTA!<br>HAS IDENTIFICADO LA ESPECIE CORRECTAMENTE.</div>",
                     unsafe_allow_html=True
                 )
 
-            with col_der:
-                if st.button("›", key=f"foto_siguiente_{st.session_state.idx_vert}", type="tertiary",
-                             disabled=len(fotos_pregunta) < 2, help="Fotografía siguiente"):
-                    st.session_state.indice_imagen = (
-                        st.session_state.indice_imagen + 1
-                    ) % len(fotos_pregunta)
+            if st.session_state.estado_respuesta_vert is not None:
+                _, centro_siguiente, _ = st.columns([1, 2, 1])
+                with centro_siguiente:
+                    siguiente = st.button("Siguiente pregunta", use_container_width=True)
+                if siguiente:
+                    st.session_state.estado_respuesta_vert = None
+                    st.session_state.temp_c = ""
+                    st.session_state.temp_o = ""
+                    st.session_state.temp_e = ""
+                    st.session_state.idx_vert += 1
                     st.rerun()
+            else:
+                _, centro_comprobar, _ = st.columns([1, 2, 1])
+                with centro_comprobar:
+                    comprobar = st.button("Comprobar respuesta", type="primary", use_container_width=True)
+                if comprobar:
+                    clase_ok = normalizar_texto(c_ing) == normalizar_texto(actual["clase"])
+                    orden_ok = normalizar_texto(o_ing) == normalizar_texto(actual["orden"])
+                    especie_ok = normalizar_texto(e_ing) == normalizar_texto(actual["especie"])
 
-            st.markdown(
-                f"<p class='pregunta-counter'>"
-                f"{st.session_state.indice_imagen + 1} / {len(fotos_pregunta)}</p>",
-                unsafe_allow_html=True
-            )
-        else:
-            st.warning("No se han encontrado fotografías locales para esta especie en su carpeta.")
+                    if clase_ok and orden_ok and especie_ok:
+                        st.session_state.aciertos_vert += 1
+                        st.session_state.estado_respuesta_vert = 'acierto'
+                    else:
+                        st.session_state.fallos_vert += 1
+                        st.session_state.estado_respuesta_vert = 'fallo'
+                    st.rerun()
+            
+            st.markdown('</div>', unsafe_allow_html=True)
 
-        if st.session_state.estado_respuesta_vert is not None:
-            val_c = actual["clase"]
-            val_o = actual["orden"]
-            val_e = actual["especie"]
-        else:
-            val_c = st.session_state.temp_c
-            val_o = st.session_state.temp_o
-            val_e = st.session_state.temp_e
-
-        c_ing = st.text_input("CLASE", value=val_c, key="input_c")
-        o_ing = st.text_input("ORDEN", value=val_o, key="input_o")
-        e_ing = st.text_input("ESPECIE", value=val_e, key="input_e")
-
-        if st.session_state.estado_respuesta_vert == 'fallo':
-            st.markdown(
-                f"<div class='feedback-error'>¡RESPUESTA INCORRECTA!<br>SOLUCIÓN: {actual['clase']} | {actual['orden']} | {actual['especie']}</div>",
-                unsafe_allow_html=True
-            )
-            st.markdown(
-                f"""<div class="side-trick-card">
-                    <p style="font-size: 0.75rem; color: #FFCCCC; font-weight: 600; line-height: 1.4; margin: 0;">
+        with col_trick:
+            st.markdown('<div class="side-trick-card">', unsafe_allow_html=True)
+            if st.session_state.estado_respuesta_vert == 'fallo':
+                st.markdown(
+                    f"""<p style="font-size: 0.85rem; color: #FFCCCC; font-weight: 600; line-height: 1.5; margin: 0;">
                         <b>TRUCO VISU:</b><br>{actual['truco']}
-                    </p>
-                </div>""",
-                unsafe_allow_html=True
-            )
-        elif st.session_state.estado_respuesta_vert == 'acierto':
-            st.markdown(
-                f"<div class='feedback-success'>¡RESPUESTA CORRECTA!<br>HAS IDENTIFICADO LA ESPECIE CORRECTAMENTE.</div>",
-                unsafe_allow_html=True
-            )
+                    </p>""",
+                    unsafe_allow_html=True
+                )
+            elif st.session_state.estado_respuesta_vert == 'acierto':
+                st.markdown(
+                    """<p style="font-size: 0.8rem; color: #80FF40; font-weight: 600; margin: 0;">
+                        ¡EXCELENTE! ¡HAS ACERTADO!
+                    </p>""",
+                    unsafe_allow_html=True
+                )
+            else:
+                st.markdown(
+                    """<p style="font-size: 0.75rem; color: #888888; font-weight: 500; margin: 0;">
+                        EL TRUCO VISU APARECERÁ AQUÍ EN CASO DE FALLAR LA PREGUNTA.
+                    </p>""",
+                    unsafe_allow_html=True
+                )
+            st.markdown('</div>', unsafe_allow_html=True)
 
-        if st.session_state.estado_respuesta_vert is not None:
-            _, centro_siguiente, _ = st.columns([1, 2, 1])
-            with centro_siguiente:
-                siguiente = st.button("Siguiente pregunta", use_container_width=True)
-            if siguiente:
-                st.session_state.estado_respuesta_vert = None
-                st.session_state.temp_c = ""
-                st.session_state.temp_o = ""
-                st.session_state.temp_e = ""
-                st.session_state.idx_vert += 1
-                st.rerun()
-        else:
-            _, centro_comprobar, _ = st.columns([1, 2, 1])
-            with centro_comprobar:
-                comprobar = st.button("Comprobar respuesta", type="primary", use_container_width=True)
-            if comprobar:
-                clase_ok = normalizar_texto(c_ing) == normalizar_texto(actual["clase"])
-                orden_ok = normalizar_texto(o_ing) == normalizar_texto(actual["orden"])
-                especie_ok = normalizar_texto(e_ing) == normalizar_texto(actual["especie"])
-
-                if clase_ok and orden_ok and especie_ok:
-                    st.session_state.aciertos_vert += 1
-                    st.session_state.estado_respuesta_vert = 'acierto'
-                else:
-                    st.session_state.fallos_vert += 1
-                    st.session_state.estado_respuesta_vert = 'fallo'
-                st.rerun()
     else:
         total_preguntas = len(st.session_state.sesion_vert)
         aciertos = st.session_state.aciertos_vert
