@@ -187,11 +187,12 @@ st.markdown("""
             position: relative !important;
         }
 
-        /* Tarjeta lateral para el truco (mismo formato, exactamente 450px de ancho, perfectamente alineada arriba) */
+        /* Tarjeta lateral para el truco (450px de ancho, centrada verticalmente y con márgenes simétricos exactos) */
         .side-trick-card {
             position: absolute;
-            left: 730px;
-            top: 2rem;
+            left: calc(75vw - 50px);
+            top: 50%;
+            transform: translateY(-50%);
             width: 450px;
             background-color: #0A0A0A;
             border: 3px solid #FFFFFF;
@@ -203,11 +204,12 @@ st.markdown("""
             text-align: center;
         }
 
-        @media (max-width: 1250px) {
+        @media (max-width: 1650px) {
             .side-trick-card {
                 position: relative !important;
                 left: auto !important;
                 top: auto !important;
+                transform: none !important;
                 width: 100% !important;
                 max-width: 450px !important;
                 margin: 1.5rem auto 0 auto !important;
