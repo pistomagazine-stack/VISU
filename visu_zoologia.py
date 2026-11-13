@@ -911,7 +911,7 @@ if seccion_seleccionada == "VERTEBRADOS":
             st.markdown(
                 f"<div class='feedback-error'>¡OOPS! RESPUESTA INCORRECTA.<br>"
                 f"SOLUCIÓN: {actual['clase']} | {actual['orden']} | {actual['especie']}<br><br>"
-                f"<b>TRUCO VISU:</b> {actual['truco']}</div>",
+                f"<b>TRUCO:</b> {actual['truco']}</div>",
                 unsafe_allow_html=True
             )
         elif st.session_state.estado_respuesta_vert == 'acierto':
