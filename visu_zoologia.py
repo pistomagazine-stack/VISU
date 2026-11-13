@@ -172,7 +172,7 @@ st.markdown("""
             color: #FFFFFF !important;
         }
 
-        /* Tarjeta central original restaurada (700px de ancho máximo y centrada) */
+        /* Tarjeta central (700px de ancho máximo y centrada) */
         .block-container {
             max-width: 700px !important;
             width: 100% !important;
@@ -186,13 +186,13 @@ st.markdown("""
             box-sizing: border-box;
         }
 
-        /* Tarjeta lateral para el truco (a la derecha, centrada verticalmente y con distancias simétricas exactas) */
+        /* Tarjeta lateral del truco: situada exactamente a la derecha del panel central y centrada verticalmente */
         .side-trick-card {
             position: fixed;
-            left: calc(75vw - 50px);
+            left: calc(50% + 380px);
             top: 50%;
             transform: translateY(-50%);
-            width: 450px;
+            width: 420px;
             background-color: #0A0A0A;
             border: 3px solid #FFFFFF;
             border-radius: 16px;
@@ -203,14 +203,14 @@ st.markdown("""
             text-align: center;
         }
 
-        @media (max-width: 1650px) {
+        @media (max-width: 1600px) {
             .side-trick-card {
                 position: relative !important;
                 left: auto !important;
                 top: auto !important;
                 transform: none !important;
                 width: 100% !important;
-                max-width: 450px !important;
+                max-width: 700px !important;
                 margin: 1.5rem auto 0 auto !important;
             }
         }
