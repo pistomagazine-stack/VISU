@@ -770,7 +770,7 @@ DATOS_VERTEBRADOS = [
     {"clase": "CL. MAMMALIA", "orden": "O. CETARTIODACTYLA", "especie": "Nu azul (Connochaetes taurinus)", "cientifico": "Connochaetes_taurinus"},
     {"clase": "CL. MAMMALIA", "orden": "O. CETARTIODACTYLA", "especie": "Berrendo (Antilocapra americana)", "cientifico": "Antilocapra_americana"},
     {"clase": "CL. MAMMALIA", "orden": "O. CETARTIODACTYLA", "especie": "Jirafa (Giraffa camelopardalis)", "cientifico": "Giraffa_camelopardalis"},
-    {"clase": "CL. MAMMALIA", "orden": "O. CETARTIODACTYLA", "especie": "Okapi (Okapia johnstoni)", "cientifico": "Okapia_johnstoni"},
+    {"clase": "CL. MAMMALIA", "orden": "O. CETARTIODACTYLA", "especie": "Okapi (Okapia johnstoni)", "cientifico": "Okapi_johnstoni"},
     {"clase": "CL. MAMMALIA", "orden": "O. INFRAORDEN CETACEA", "especie": "Delfín listado (Stenella coeruleoalba)", "cientifico": "Stenella_coeruleoalba"},
     {"clase": "CL. MAMMALIA", "orden": "O. INFRAORDEN CETACEA", "especie": "Orca (Orcinus orca)", "cientifico": "Orcinus_orca"},
     {"clase": "CL. MAMMALIA", "orden": "O. INFRAORDEN CETACEA", "especie": "Cachalote (Physeter macrocephalus)", "cientifico": "Physeter_macrocephalus"},
@@ -797,7 +797,7 @@ def normalizar_texto(texto):
     sin_tildes = "".join([c for c in nfkd_form if not unicodedata.combining(c)])
     return sin_tildes.strip().lower()
 
-def obtener_fotos(nombre_especie, max_fotos=2):
+def obtener_fotos(nombre_especie, max_fotos=3):
     carpeta_base = Path("IMAGENES") / nombre_especie
     fotos = []
     
@@ -846,7 +846,8 @@ if seccion_seleccionada == "VERTEBRADOS":
             st.session_state.imagen_especie_actual = actual["especie"]
             st.session_state.indice_imagen = 0
 
-        fotos_pregunta = obtener_fotos(actual["especie"], max_fotos=2)
+        # CAMBIO: max_fotos ampliado a 3
+        fotos_pregunta = obtener_fotos(actual["especie"], max_fotos=3)
 
         st.markdown(
             f"<p class='pregunta-counter'>"
